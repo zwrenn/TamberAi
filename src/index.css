@@ -1,13 +1,30 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face { 
+  font-family: 'tisa sans pro';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Tisa Sans Pro'), url('https://fonts.cdnfonts.com/s/72024/Tisa%20Sans%20Pro%20Regular.woff') format('woff');
+}
+@font-face { 
+  font-family: 'tisa sans pro';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Tisa Sans Pro'), url('https://fonts.cdnfonts.com/s/72024/Tisa%20Sans%20Pro%20Italic.woff') format('woff');
+}
+/* ... (All other @font-face definitions can follow the same pattern) ... */
+
+body {  
+    margin: 0;
+    font-family: 'tisa sans pro', serif;
+    background: var(--canvas);
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-20);
+    font-weight: 400;
+    color: var(--dark-gray);
+    font-variant: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

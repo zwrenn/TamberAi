@@ -1,0 +1,9 @@
+.target-geography {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.target-geography div {
+    margin-bottom: 10px;
+}

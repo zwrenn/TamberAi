@@ -1,0 +1,71 @@
+.section-details {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    background-color: #f4f4f4;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tabs button.active {
+    background-color: #ddd;
+}
+
+.tabs button:hover {
+    background-color: #e4e4e4;
+}
+
+.tab-content {
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.bar-chart {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.bar {
+    width: 15%;
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+    padding-top: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.bar:hover {
+    background-color: #2980b9;
+}
+
+.combo-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.combo-table th, .combo-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.combo-table th {
+    background-color: #f4f4f4;
+}
+
+.combo-table tr:hover {
+    background-color: #f9f9f9;
+}

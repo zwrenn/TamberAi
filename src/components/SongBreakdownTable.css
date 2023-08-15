@@ -1,0 +1,51 @@
+.song-breakdown-table {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* Ensure the table doesn't overflow the container */
+}
+
+.song-breakdown-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.song-breakdown-table th, .song-breakdown-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.song-breakdown-table th {
+    background-color: #f5f5f5;
+    text-align: left;
+}
+
+.bar-chart {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.bar {
+    width: 30px;
+    background-color: #007BFF;
+    text-align: center;
+    color: white;
+    margin-right: 10px;
+}
+
+.combo-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.combo-table th, .combo-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.combo-table th {
+    background-color: #f2f2f2;
+}
