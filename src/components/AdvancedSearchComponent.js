@@ -9,7 +9,6 @@ import QuickSearchComponent from './QuickSearchComponent';
 import ResultsTable from './ResultsTable';
 
 
-
 const AdvancedSearchComponent = () => {
 
     // This is just dummy data for illustration

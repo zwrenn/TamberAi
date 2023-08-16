@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import './ChartPositionComponent.css';
 
 
-const ChartPositionComponent = () => {
-    const [position, setPosition] = useState(''); // Initial value as an empty string
-
+const ChartPositionComponent = ({ position, setPosition }) => {
     return (
         <div className="chart-position">
             <label htmlFor="position">Chart Position: </label>
@@ -19,5 +17,6 @@ const ChartPositionComponent = () => {
         </div>
     );
 }
+
 
 export default ChartPositionComponent;

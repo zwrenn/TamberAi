@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import './EraYearComponent.css';
+import SearchButton from './SearchButton'; // Adjust the path according to your folder structure
+import ChartPositionComponent from './ChartPositionComponent'; 
 
 const EraYearComponent = () => {
     const [era, setEra] = useState('');
     const [year, setYear] = useState(1958); // Setting default year as 1958
+    const [songs, setSongs] = useState([]); // State to store fetched songs
+    const [chartPos, setChartPos] = useState(''); 
+
 
     const updateYear = async (selectedYear) => {
         try {
@@ -21,24 +26,9 @@ const EraYearComponent = () => {
         }
     };
 
-    const handleEraChange = async (e) => {
+    const handleEraChange = (e) => {
         const selectedEra = e.target.value;
         setEra(selectedEra);
-
-        // Assuming you have an API endpoint to send the selected era
-        try {
-            await fetch('http://localhost:5001/api/updateEra', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ era: selectedEra })
-            });
-
-            // Handle the response if needed
-        } catch (error) {
-            console.error('Error updating era:', error);
-        }
     };
 
     return (
@@ -77,6 +67,20 @@ const EraYearComponent = () => {
                         updateYear(selectedYear); // Call the API to update the year
                     }}
                 />
+            </div>
+
+            <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
+
+            {/* SearchButton component */}
+            <SearchButton era={era} chartPos={chartPos} onSearchResults={setSongs} />
+
+            
+            <div className="song-results">
+                <ul>
+                    {songs.map(song => (
+                        <li key={song.id}>{song.title} by {song.artist}</li>
+                    ))}
+                </ul>
             </div>
         </div>
     );
