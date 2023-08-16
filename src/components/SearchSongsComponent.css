@@ -1,0 +1,28 @@
+/* SearchSongsComponent.css */
+
+.song-table {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* For horizontal scrolling if the table overflows the container width */
+}
+
+.song-table h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.song-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.song-table th, .song-table td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
+}
+
+.song-table th {
+    background-color: #f2f2f2;
+}

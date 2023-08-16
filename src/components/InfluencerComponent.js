@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import './EraYearComponent.css';
-import SearchButton from './SearchButton'; // Adjust the path according to your folder structure
+import SearchButton from './SearchButton';
 import ChartPositionComponent from './ChartPositionComponent';
 import Select from 'react-select';
 import SearchSongsComponent from './SearchSongsComponent';
+import './InfluencerComponent.css';
 
-const EraYearComponent = () => {
+const InfluencerComponent = () => {
     const [era, setEra] = useState('');
-    const [year, setYear] = useState(1958); // Setting default year as 1958
-    const [songs, setSongs] = useState([]); // State to store fetched songs
+    const [year, setYear] = useState(1958);
+    const [songs, setSongs] = useState([]);
     const [chartPos, setChartPos] = useState('');
     const [countries, setCountries] = useState([]);
     const [location, setLocation] = useState('');
@@ -19,9 +19,10 @@ const EraYearComponent = () => {
     const [bpm, setBpm] = useState('');
     const [instruments, setInstruments] = useState([]);
     const [selectedInstruments, setSelectedInstruments] = useState([]);
-    const [chords, setChords] = useState([]); // New state for selected chords
+    const [chords, setChords] = useState([]);
     const [selectedChords, setSelectedChords] = useState([]);
     const [searchText, setSearchText] = useState('');
+
 
     useEffect(() => {
         const fetchChords = async () => {
@@ -121,7 +122,8 @@ const EraYearComponent = () => {
     };
 
     return (
-        <div className="era-year">
+        <div className="influencer-component">
+            <div className="top-row">
             <div className="era-dropdown">
                 <label htmlFor="era">Era: </label>
                 <select 
@@ -194,7 +196,9 @@ const EraYearComponent = () => {
                     }}
                 />
             </div>
+            </div>
     
+            <div className="bottom-row">
             <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
     
             <div className="location-dropdown">
@@ -242,6 +246,7 @@ const EraYearComponent = () => {
                         </option>
                     ))}
                 </select>
+                </div>
             </div>
     
             <SearchButton 
@@ -251,15 +256,14 @@ const EraYearComponent = () => {
                 selectedKey={selectedKey} 
                 selectedGenre={selectedGenre} 
                 bpm={bpm}
-                selectedChords={selectedChords} // Pass selectedChords to SearchButton
+                selectedChords={selectedChords} 
                 selectedInstruments={selectedInstruments}
-                searchText={searchText} // Pass searchText to SearchButton
+                searchText={searchText} 
                 onSearchResults={setSongs} 
             />
-
             <SearchSongsComponent songs={songs} />
         </div>
     );    
 }
 
-export default EraYearComponent;
+export default InfluencerComponent;

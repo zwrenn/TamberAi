@@ -1,20 +1,11 @@
-/* InstrumentComponent.css */
-.instruments {
-    display: flex; /* Display the select and options as flex items */
-    align-items: center; /* Align items vertically within the container */
-    gap: 10px; /* Add a gap between items for spacing */
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin: 10px 0;
+.influencer-component {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-/* Style the select element */
-.instruments select {
-    flex: 1; /* Allow the select to grow and fill available space */
-    max-width: 200px; /* Set a maximum width to prevent it from expanding too much */
-}
-
-/* Style the option elements */
-.instruments option {
-    padding: 5px;
+.top-row, .bottom-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }

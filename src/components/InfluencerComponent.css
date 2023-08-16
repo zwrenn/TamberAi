@@ -1,0 +1,23 @@
+.influencer-component {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* For horizontal scrolling if the component overflows container width */
+}
+
+.influencer-component .era-year,
+.influencer-component .era-dropdown,
+.influencer-component .instrument-dropdown,
+.influencer-component .chord-input,
+.influencer-component .search-text-input,
+.influencer-component .year-slider,
+.influencer-component .location-dropdown,
+.influencer-component .key-dropdown,
+.influencer-component .bpm-input,
+.influencer-component .genre-dropdown {
+    /* Styling that you'd want to apply to these specific divs */
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+/* You can continue with more specific styles as needed */
