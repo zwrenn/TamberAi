@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 const SearchButton = ({ era, chartPos, location, selectedKey, selectedGenre, bpm, selectedChords, selectedInstruments, onSearchResults }) => {
     const handleSearch = async () => {
@@ -49,7 +50,9 @@ const SearchButton = ({ era, chartPos, location, selectedKey, selectedGenre, bpm
     };
 
     return (
-        <button onClick={handleSearch}>Search</button>
+        <Button variant="primary" onClick={handleSearch}>
+            Search
+        </Button>
     );
 }
 

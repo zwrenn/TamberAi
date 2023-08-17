@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './EraYearComponent.css';
-import SearchButton from './SearchButton'; // Adjust the path according to your folder structure
+import { Form, Container, Row, Col, Button as BootstrapButton } from 'react-bootstrap';
+import SearchButton from './SearchButton';
 import ChartPositionComponent from './ChartPositionComponent';
 import Select from 'react-select';
 import SearchSongsComponent from './SearchSongsComponent';
+import './EraYearComponent.css';
 
 const EraYearComponent = () => {
     const [era, setEra] = useState('');
@@ -121,144 +122,173 @@ const EraYearComponent = () => {
     };
 
     return (
-        <div className="era-year">
-            <div className="era-dropdown">
-                <label htmlFor="era">Era: </label>
-                <select 
-                    id="era"
-                    value={era}
-                    onChange={handleEraChange}>
-                    <option value="">--Select an era--</option>
-                    <option value="1950s">1950s</option>
-                    <option value="1960s">1960s</option>
-                    <option value="1970s">1970s</option>
-                    <option value="1980s">1980s</option>
-                    <option value="1990s">1990s</option>
-                    <option value="2000s">2000s</option>
-                    <option value="2010s">2010s</option>
-                    <option value="2020s">2020s</option>
-                </select>
-            </div>
+        <Container className="mt-4">
+            <h2> Advanced Search </h2>
+
+            <Row>
+                <Col md={4}>
+                    <Form.Group controlId="era">
+                        <Form.Label>Era:</Form.Label>
+                        <Form.Control as="select" value={era} onChange={handleEraChange}>
+                            <option value="">--Select an era--</option>
+                            <option value="1950s">1950s</option>
+                            <option value="1960s">1960s</option>
+                            <option value="1970s">1970s</option>
+                            <option value="1980s">1980s</option>
+                            <option value="1990s">1990s</option>
+                            <option value="2000s">2000s</option>
+                            <option value="2010s">2010s</option>
+                            <option value="2020s">2020s</option>
+                            </Form.Control>
+                    </Form.Group>
+                </Col>
             
-            <div className="instrument-dropdown">
-                <label htmlFor="instruments">Instruments: </label>
-                <Select 
-                    id="instruments"
-                    isMulti
-                    options={instruments.map(instrument => ({ value: instrument.instrument_id, label: instrument.instrument_name }))}
-                    onChange={selectedOptions => {
-                        const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
-                        setSelectedInstruments(selectedValues);
-                    }}
-                />
-            </div>
+                <Col md={4}>
+                    <Form.Group controlId="instruments">
+                        <Form.Label>Instruments:</Form.Label>
+                        <Select 
+                            isMulti
+                            options={instruments.map(instrument => ({ value: instrument.instrument_id, label: instrument.instrument_name }))}
+                            onChange={selectedOptions => {
+                                const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                                setSelectedInstruments(selectedValues);
+                            }}
+                        />
+                    </Form.Group>
+                </Col>
 
-            <div className="chord-input">
-                <label htmlFor="chords">Chords: </label>
-                <input
-                    type="text"
-                    id="chords"
-                    value={selectedChords.join(', ')} // Convert array to comma-separated string
-                    onChange={e => {
-                        const inputText = e.target.value;
-                        const chordsArray = inputText.split(',').map(chord => chord.trim());
-                        setSelectedChords(chordsArray);
-                    }}
-                />
-            </div>
+                <Col md={4}>
+                    <Form.Group controlId="chords">
+                        <Form.Label>Chords:</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={selectedChords.join(', ')} 
+                            onChange={e => {
+                                const inputText = e.target.value;
+                                const chordsArray = inputText.split(',').map(chord => chord.trim());
+                                setSelectedChords(chordsArray);
+                            }}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
 
-            <div className="search-text-input">
-                <label htmlFor="searchText">Search Text: </label>
-                <input 
-                    type="text" 
-                    id="searchText" 
-                    value={searchText}
-                    onChange={handleSearchTextChange}
-                    placeholder="Enter artist or song"
-                />
-            </div>
+            <Row>
+                <Col md={4}>
+                    <Form.Group controlId="searchText">
+                        <Form.Label>Search Text:</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={searchText}
+                            onChange={handleSearchTextChange}
+                            placeholder="Enter artist or song"
+                        />
+                    </Form.Group>
+                </Col>
 
-            <div className="year-slider">
-                <label htmlFor="year">Year: {year}</label>
-                <input 
-                    type="range" 
-                    id="year" 
-                    name="year" 
-                    min="1958" 
-                    max="2023" 
-                    value={year}
-                    onChange={e => {
-                        const selectedYear = e.target.value;
-                        setYear(selectedYear);
-                        updateYear(selectedYear); // Call the API to update the year
-                    }}
-                />
-            </div>
-    
-            <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
-    
-            <div className="location-dropdown">
-                <label htmlFor="location">Location: </label>
-                <select value={location} onChange={e => setLocation(e.target.value)}>
-                    <option value="">--Select a Country--</option>
-                    {countries.map(country => (
-                        <option key={country.country_id} value={country.country_id}>
-                            {country.countryname}
-                        </option>
-                    ))}
-                </select>
-            </div>
-    
-            <div className="key-dropdown">
-                <label htmlFor="key">Key: </label>
-                <select value={selectedKey} onChange={e => setSelectedKey(e.target.value)}>
-                    <option value="">--Select a Key--</option>
-                    {keys.map(key => (
-                        <option key={key.keysignatureid} value={key.keysignatureid}>
-                            {key.keyname}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                <Col md={4}>
+                    <Form.Group controlId="year">
+                        <Form.Label>Year: {year}</Form.Label>
+                        <Form.Control 
+                            type="range" 
+                            min="1958" 
+                            max="2023" 
+                            value={year}
+                            onChange={e => {
+                                const selectedYear = e.target.value;
+                                setYear(selectedYear);
+                                updateYear(selectedYear); // Call the API to update the year
+                            }}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
 
-            <div className="bpm-input">
-                <label htmlFor="bpm">BPM: </label>
-                <input 
-                    type="number" 
-                    id="bpm" 
-                    value={bpm}
-                    onChange={e => setBpm(e.target.value)}
-                    placeholder="Enter BPM"
-                />
-            </div>
+            <Row>
+                <Col md={4}>
+                    <Form.Group controlId="location">
+                        <Form.Label>Location:</Form.Label>
+                        <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
+                            <option value="">--Select a Country--</option>
+                            {countries.map(country => (
+                                <option key={country.country_id} value={country.country_id}>
+                                    {country.countryname}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
 
-            <div className="genre-dropdown">
-                <label htmlFor="genre">Genre: </label>
-                <select value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
-                    <option value="">--Select a Genre--</option>
-                    {genres.map(genre => (
-                        <option key={genre.genre_id} value={genre.genre_id}>
-                            {genre.genre_name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-    
-            <SearchButton 
-                era={era} 
-                chartPos={chartPos} 
-                location={location} 
-                selectedKey={selectedKey} 
-                selectedGenre={selectedGenre} 
-                bpm={bpm}
-                selectedChords={selectedChords} // Pass selectedChords to SearchButton
-                selectedInstruments={selectedInstruments}
-                searchText={searchText} // Pass searchText to SearchButton
-                onSearchResults={setSongs} 
-            />
+                <Col md={4}>
+                    <Form.Group controlId="key">
+                        <Form.Label>Key:</Form.Label>
+                        <Form.Control as="select" value={selectedKey} onChange={e => setSelectedKey(e.target.value)}>
+                            <option value="">--Select a Key--</option>
+                            {keys.map(key => (
+                                <option key={key.keysignatureid} value={key.keysignatureid}>
+                                    {key.keyname}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                    <Form.Group controlId="bpm">
+                        <Form.Label>BPM:</Form.Label>
+                        <Form.Control 
+                            type="number" 
+                            value={bpm}
+                            onChange={e => setBpm(e.target.value)}
+                            placeholder="Enter BPM"
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={4}>
+                    <Form.Group controlId="genre">
+                        <Form.Label>Genre:</Form.Label>
+                        <Form.Control as="select" value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
+                            <option value="">--Select a Genre--</option>
+                            {genres.map(genre => (
+                                <option key={genre.genre_id} value={genre.genre_id}>
+                                    {genre.genre_name}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={4}>
+                    <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
+                </Col>
+            </Row>
+
+            <Row>
+                <Col>
+                    <SearchButton 
+                        variant="primary"
+                        era={era} 
+                        chartPos={chartPos} 
+                        location={location} 
+                        selectedKey={selectedKey} 
+                        selectedGenre={selectedGenre} 
+                        bpm={bpm}
+                        selectedChords={selectedChords} 
+                        selectedInstruments={selectedInstruments}
+                        searchText={searchText} 
+                        onSearchResults={setSongs} 
+                    />
+                </Col>
+            </Row>
 
             <SearchSongsComponent songs={songs} />
-        </div>
+
+            </Container>
     );    
 }
 

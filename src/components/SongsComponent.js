@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './SongsComponent.css';
 
 const SongsComponent = () => {
     const [song1, setSong1] = useState('');
@@ -8,45 +7,57 @@ const SongsComponent = () => {
     const [influence2, setInfluence2] = useState(50); // Initializing to 50 (midpoint).
 
     return (
-        <div className="songs">
+        <div className="p-4 border rounded shadow-sm">
             <h2>Songs</h2>
 
-            <div>
-                <label htmlFor="song1">Song 1: </label>
-                <input 
-                    id="song1"
-                    type="text"
-                    value={song1}
-                    onChange={e => setSong1(e.target.value)}
-                />
-                <label htmlFor="influence1">Influence: {influence1}</label>
-                <input 
-                    id="influence1"
-                    type="range"
-                    min="1"
-                    max="100"
-                    value={influence1}
-                    onChange={e => setInfluence1(e.target.value)}
-                />
+            <div className="row mb-3">
+                <div className="col-md-6">
+                    <label htmlFor="song1" className="form-label">Song 1: </label>
+                    <input 
+                        id="song1"
+                        type="text"
+                        className="form-control"
+                        value={song1}
+                        onChange={e => setSong1(e.target.value)}
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label htmlFor="influence1" className="form-label">Influence: {influence1}</label>
+                    <input 
+                        id="influence1"
+                        type="range"
+                        className="form-range"
+                        min="1"
+                        max="100"
+                        value={influence1}
+                        onChange={e => setInfluence1(e.target.value)}
+                    />
+                </div>
             </div>
 
-            <div>
-                <label htmlFor="song2">Song 2: </label>
-                <input 
-                    id="song2"
-                    type="text"
-                    value={song2}
-                    onChange={e => setSong2(e.target.value)}
-                />
-                <label htmlFor="influence2">Influence: {influence2}</label>
-                <input 
-                    id="influence2"
-                    type="range"
-                    min="1"
-                    max="100"
-                    value={influence2}
-                    onChange={e => setInfluence2(e.target.value)}
-                />
+            <div className="row">
+                <div className="col-md-6">
+                    <label htmlFor="song2" className="form-label">Song 2: </label>
+                    <input 
+                        id="song2"
+                        type="text"
+                        className="form-control"
+                        value={song2}
+                        onChange={e => setSong2(e.target.value)}
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label htmlFor="influence2" className="form-label">Influence: {influence2}</label>
+                    <input 
+                        id="influence2"
+                        type="range"
+                        className="form-range"
+                        min="1"
+                        max="100"
+                        value={influence2}
+                        onChange={e => setInfluence2(e.target.value)}
+                    />
+                </div>
             </div>
         </div>
     );

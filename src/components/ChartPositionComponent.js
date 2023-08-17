@@ -1,22 +1,18 @@
-import React, { useState } from 'react';
-import './ChartPositionComponent.css';
-
+import React from 'react';
+import { Form } from 'react-bootstrap';
 
 const ChartPositionComponent = ({ position, setPosition }) => {
     return (
-        <div className="chart-position">
-            <label htmlFor="position">Chart Position: </label>
-            <input 
+        <Form.Group controlId="position" className="chart-position">
+            <Form.Label>Chart Position:</Form.Label>
+            <Form.Control 
                 type="number" 
-                id="position" 
-                name="position" 
                 value={position}
                 onChange={e => setPosition(e.target.value)}
                 placeholder="Enter chart position"
             />
-        </div>
+        </Form.Group>
     );
 }
-
 
 export default ChartPositionComponent;

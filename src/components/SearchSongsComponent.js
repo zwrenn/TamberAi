@@ -1,10 +1,10 @@
 import React from 'react';
-import './SearchSongsComponent.css';
+import { Table } from 'react-bootstrap';
 
 const SearchSongsComponent = ({ songs }) => {
     return (
         <div className="song-table">
-            <table>
+            <Table striped bordered hover responsive>
                 <thead>
                     <tr>
                         <th>Title</th>
@@ -34,7 +34,7 @@ const SearchSongsComponent = ({ songs }) => {
                         <th>Chart Position</th>
                         <th>Country</th>
                         <th>Era</th>
-                    </tr>
+                        </tr>
                 </thead>
                 <tbody>
                     {songs.map(song => (
@@ -66,10 +66,10 @@ const SearchSongsComponent = ({ songs }) => {
                             <td>{song["Chart Pos"]}</td>
                             <td>{song.location}</td>
                             <td>{song.era}</td>
-                        </tr>
+                            </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
         </div>
     );
 }

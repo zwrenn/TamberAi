@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './SectionDetailsComponent.css';
 
 const SectionDetailsComponent = () => {
     const [activeTab, setActiveTab] = useState('Verse');  // Default to 'Verse' tab
@@ -74,12 +73,12 @@ const SectionDetailsComponent = () => {
     };
 
     return (
-        <div className="section-details">
-            <div className="tabs">
+        <div className="p-4 border rounded shadow-sm">
+            <div className="btn-group d-flex justify-content-between mb-3">
                 {['Verse', 'Pre-Chorus', 'Chorus', 'Bridge', 'Outro'].map(tab => (
                     <button 
                         key={tab}
-                        className={activeTab === tab ? 'active' : ''}
+                        className={`btn btn-${activeTab === tab ? 'primary' : 'secondary'}`}
                         onClick={() => setActiveTab(tab)}
                     >
                         {tab}
@@ -88,17 +87,17 @@ const SectionDetailsComponent = () => {
             </div>
 
             {/* Content for active tab */}
-            <div className="tab-content">
+            <div>
                 <p><strong>Most Common:</strong> {sampleData[activeTab].mostCommon}</p>
                 <p><strong>Most Common Instrument Combination:</strong> {sampleData[activeTab].mostCommonCombo}</p>
 
                 {/* Bar Chart */}
-                <div className="bar-chart">
+                <div className="d-flex justify-content-between align-items-end">
                     {Object.keys(sampleData[activeTab].instrumentPresence).map(instrument => (
                         <div 
                             key={instrument}
-                            className="bar" 
-                            style={{height: `${sampleData[activeTab].instrumentPresence[instrument]}%`}}
+                            className="bg-info text-white text-center p-1" 
+                            style={{height: `${sampleData[activeTab].instrumentPresence[instrument]}%`, width: '18%'}}
                         >
                             {instrument}
                         </div>
@@ -106,7 +105,7 @@ const SectionDetailsComponent = () => {
                 </div>
 
                 {/* Combination Table */}
-                <table className="combo-table">
+                <table className="table mt-3">
                     <thead>
                         <tr>
                             <th>Instrument Combination</th>
