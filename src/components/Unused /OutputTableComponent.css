@@ -1,0 +1,21 @@
+.output-table {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* For horizontal scrolling if table overflows container width */
+}
+
+.output-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.output-table th, .output-table td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
+}
+
+.output-table th {
+    background-color: #f2f2f2;
+}

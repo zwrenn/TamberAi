@@ -1,0 +1,11 @@
+.influencer-component {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.top-row, .bottom-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

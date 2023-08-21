@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Container, Row, Col, Button as BootstrapButton } from 'react-bootstrap';
-import SearchButton from './SearchButton';
 import ChartPositionComponent from './ChartPositionComponent';
-import Select from 'react-select';
-import SearchSongsComponent from './SearchSongsComponent';
-
+import { Table } from 'react-bootstrap';
 
 const InfluencerComponent = () => {
     const [era, setEra] = useState('');
@@ -18,42 +15,10 @@ const InfluencerComponent = () => {
     const [genres, setGenres] = useState([]);
     const [selectedGenre, setSelectedGenre] = useState('');
     const [bpm, setBpm] = useState('');
-    const [instruments, setInstruments] = useState([]);
-    const [selectedInstruments, setSelectedInstruments] = useState([]);
-    const [chords, setChords] = useState([]);
-    const [selectedChords, setSelectedChords] = useState([]);
-    const [searchText, setSearchText] = useState('');
     const [commonInstruments, setCommonInstruments] = useState([]);
-    const [showInstruments, setShowInstruments] = useState(false);
-
-
-    useEffect(() => {
-        const fetchChords = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/chords');
-                const data = await response.json();
-                setChords(data);
-            } catch (error) {
-                console.error("Error fetching chord options:", error);
-            }
-        };
-
-        fetchChords();
-    }, []);
-
-    useEffect(() => {
-        const fetchInstruments = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/instruments');
-                const data = await response.json();
-                setInstruments(data);
-            } catch (error) {
-                console.error("Error fetching instruments:", error);
-            }
-        };
-
-        fetchInstruments();
-    }, []);
+    const [commonKeys, setCommonKeys] = useState([]);
+    const [commonBPMs, setCommonBPMs] = useState([]);
+    const [commonCamelots, setCommonCamelots] = useState([]);
 
     useEffect(() => {
         const fetchGenres = async () => {
@@ -118,27 +83,47 @@ const InfluencerComponent = () => {
         const selectedEra = e.target.value;
         setEra(selectedEra);
     };
-
-    const handleSearchTextChange = (e) => {
-        const newText = e.target.value;
-        setSearchText(newText);
-    };
-
-    const fetchCommonInstruments = async () => {
+    
+    const fetchCommonData = async () => {
+        console.log("era:", era);
+        console.log("selectedGenre:", selectedGenre);
+        console.log("location:", location);
         try {
-            const response = await fetch(`http://localhost:5001/api/popular-instruments?era=${era}&genre=${selectedGenre}`);
+            let apiUrl = `http://localhost:5001/api/popular-instruments?`;
+    
+            if (era) {
+                apiUrl += `era=${era}`;
+            }
+    
+            if (selectedGenre) {
+                if (era) {
+                    apiUrl += `&`;
+                }
+                apiUrl += `genre=${selectedGenre}`;
+            }
+    
+            if (location) {
+                if (era || selectedGenre) {
+                    apiUrl += `&`;
+                }
+                apiUrl += `location=${location}`;
+            }
+    
+            const response = await fetch(apiUrl);
             const data = await response.json();
-            setCommonInstruments(data);
-            setShowInstruments(true);
+    
+            setCommonInstruments(data.instruments);  
+            setCommonKeys(data.keys);
+            setCommonBPMs(data.bpms);
+            setCommonCamelots(data.camelots);
         } catch (error) {
-            console.error("Error fetching common instruments:", error);
+            console.error("Error fetching data:", error);
         }
     };
     
-
+    
     return (
         <Container className="mt-4 influencer-component">
-            <h2>Search</h2>
 
             <Row className="top-row">
                 <Col md={3}>
@@ -158,49 +143,6 @@ const InfluencerComponent = () => {
                     </Form.Group>
                 </Col>
             
-                <Col md={3}>
-                    <Form.Group controlId="instruments">
-                        <Form.Label>Instruments:</Form.Label>
-                        <Select 
-                            isMulti
-                            options={instruments.map(instrument => ({ value: instrument.instrument_id, label: instrument.instrument_name }))}
-                            onChange={selectedOptions => {
-                                const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
-                                setSelectedInstruments(selectedValues);
-                            }}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={3}>
-                    <Form.Group controlId="chords">
-                        <Form.Label>Chords:</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            value={selectedChords.join(', ')} 
-                            onChange={e => {
-                                const inputText = e.target.value;
-                                const chordsArray = inputText.split(',').map(chord => chord.trim());
-                                setSelectedChords(chordsArray);
-                            }}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={3}>
-                    <Form.Group controlId="searchText">
-                        <Form.Label>Search Text:</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            value={searchText}
-                            onChange={handleSearchTextChange}
-                            placeholder="Enter artist or song"
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
-
-            <Row className="bottom-row">
                 <Col md={2}>
                     <Form.Group controlId="year">
                         <Form.Label>Year: {year}</Form.Label>
@@ -221,7 +163,9 @@ const InfluencerComponent = () => {
                 <Col md={2}>
                     <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
                 </Col>
+            </Row>
 
+            <Row className="bottom-row">
                 <Col md={2}>
                     <Form.Group controlId="location">
                         <Form.Label>Location:</Form.Label>
@@ -279,44 +223,49 @@ const InfluencerComponent = () => {
 
             <Row style={{ paddingTop: '20px', paddingBottom: '20px' }}>
                 <Col>
-                    <SearchButton 
-                        variant="primary"
-                        era={era} 
-                        chartPos={chartPos} 
-                        location={location} 
-                        selectedKey={selectedKey} 
-                        selectedGenre={selectedGenre} 
-                        bpm={bpm}
-                        selectedChords={selectedChords} 
-                        selectedInstruments={selectedInstruments}
-                        searchText={searchText} 
-                        onSearchResults={setSongs} 
-                    />
+                <BootstrapButton onClick={fetchCommonData}>Search Common Data</BootstrapButton>
                 </Col>
             </Row>
 
-            <BootstrapButton onClick={fetchCommonInstruments}>Get Most Common Instruments</BootstrapButton>
+            <h3>Most Common</h3>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Instrument Name</th>
+                        <th>Key</th>
+                        <th>Camelot</th>
+                        <th>BPM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {(() => {
+                        // Separate and filter top 3 instruments, keys, and BPMs
+                        const topInstruments = commonInstruments.filter(item => item.type === "instrument").slice(0, 3);
+                        const topKeys = commonKeys.filter(item => item.type === "key").slice(0, 3);
+                        const topBPMs = commonBPMs.filter(item => item.type === "bpm").slice(0, 3);
+                        const topCamelots = commonCamelots.filter(item => item.type === "camelot").slice(0, 3);
 
+                        // Determine the maximum rows required (it would be 3 in our case)
+                        const rows = Math.max(topInstruments.length, topKeys.length, topBPMs.length, topCamelots.length);
 
-            <SearchSongsComponent songs={songs} />
-
-            {
-    showInstruments && commonInstruments.length > 0 && (
-        <div>
-            <h3>Most Common Instruments for the Chorus:</h3>
-            <ul>
-                {commonInstruments.map(instrument => (
-                    <li key={instrument.instrument_id}>
-                        Instrument ID: {instrument.instrument_id}, Frequency: {instrument.frequency}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    )
-}
-
+                        // Create table rows
+                        const tableRows = [];
+                        for (let i = 0; i < rows; i++) {
+                            tableRows.push(
+                                <tr key={"common-" + i}>
+                                    <td>{topInstruments[i] ? topInstruments[i].name : null}</td>
+                                    <td>{topKeys[i] ? topKeys[i].name : null}</td>
+                                    <td>{topCamelots[i] ? topCamelots[i].name : null}</td>
+                                    <td>{topBPMs[i] ? topBPMs[i].name : null}</td>
+                                </tr>
+                            );
+                        }
+                        return tableRows;
+                    })()}
+                </tbody>
+            </Table>
         </Container>
-    );    
+    );
 }
 
 export default InfluencerComponent;

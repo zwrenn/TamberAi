@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-const SearchButton = ({ era, chartPos, location, selectedKey, selectedGenre, bpm, selectedChords, selectedInstruments, onSearchResults }) => {
+const SearchButton = ({ era, chartPos, location, selectedKey, selectedGenre, bpm, selectedChords, selectedInstruments, onSearchResults, onPopularParams }) => {
     const handleSearch = async () => {
         if (!era && !chartPos && !location && !selectedKey && !selectedGenre && !bpm && (!selectedChords || selectedChords.length === 0) && (!selectedInstruments || selectedInstruments.length === 0)) {
             alert('Please select an era, a chart position, a location, a key, a genre, or a BPM before searching.');
@@ -41,11 +41,19 @@ const SearchButton = ({ era, chartPos, location, selectedKey, selectedGenre, bpm
         }
     
         try {
+            // Fetching songs data
             const response = await fetch(url);
             const songsData = await response.json();
             onSearchResults(songsData);
+
+            // Fetching popular parameters
+            const paramsUrl = `http://localhost:5001/api/popular-params?era=${era}&country=${location}&genre=${selectedGenre}`;
+            const paramsResponse = await fetch(paramsUrl);
+            const popularParamsData = await paramsResponse.json();
+            onPopularParams(popularParamsData);
+
         } catch (error) {
-            console.error('Error fetching songs:', error);
+            console.error('Error fetching data:', error);
         }
     };
 

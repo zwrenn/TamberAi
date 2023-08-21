@@ -2,7 +2,6 @@ import ArtistsComponent from './ArtistsComponent';
 import SongsComponent from './SongsComponent';
 import InfluencerComponent from './InfluencerComponent';
 import SectionDetailsComponent from './SectionDetailsComponent';
-import SongBreakdownTable from './SongBreakdownTable';
 
 const CreateComponent = () => {
     return (
@@ -10,7 +9,6 @@ const CreateComponent = () => {
             <ArtistsComponent />
             <SongsComponent />
             <InfluencerComponent />
-            <SongBreakdownTable />
             <SectionDetailsComponent />
             {/* Other sections will go here */}
         </div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Container, Row, Col, Button as BootstrapButton } from 'react-bootstrap';
+import { Form, Container, Row, Col } from 'react-bootstrap';
 import SearchButton from './SearchButton';
 import ChartPositionComponent from './ChartPositionComponent';
 import Select from 'react-select';
 import SearchSongsComponent from './SearchSongsComponent';
 import './EraYearComponent.css';
+import { Table } from 'react-bootstrap';
+
 
 const EraYearComponent = () => {
     const [era, setEra] = useState('');
@@ -23,20 +25,25 @@ const EraYearComponent = () => {
     const [chords, setChords] = useState([]); // New state for selected chords
     const [selectedChords, setSelectedChords] = useState([]);
     const [searchText, setSearchText] = useState('');
+    const [commonInstruments, setCommonInstruments] = useState([]);
+    const [popularParams, setPopularParams] = useState({});
 
+    
     useEffect(() => {
-        const fetchChords = async () => {
+        const fetchCommonInstruments = async () => {
             try {
-                const response = await fetch('http://localhost:5001/api/chords');
+                const response = await fetch(`http://localhost:5001/api/popular-instruments?era=${era}&genre=${selectedGenre}`);
                 const data = await response.json();
-                setChords(data);
+                setCommonInstruments(data);
             } catch (error) {
-                console.error("Error fetching chord options:", error);
+                console.error("Error fetching common instruments:", error);
             }
         };
 
-        fetchChords();
-    }, []);
+        if (era && selectedGenre) {
+            fetchCommonInstruments();
+        }
+    }, [era, selectedGenre]);
 
     useEffect(() => {
         const fetchInstruments = async () => {
@@ -120,6 +127,30 @@ const EraYearComponent = () => {
         const newText = e.target.value;
         setSearchText(newText);
     };
+
+    useEffect(() => {
+        const fetchPopularParams = async () => {
+            try {
+                const response = await fetch(`http://localhost:5001/api/popular-params?era=${era}&country=${location}&genre=${selectedGenre}`);
+                
+                const data = await response.json();
+                console.log("Fetched popular parameters:", data);  // This line logs the fetched data
+                setPopularParams(data);
+    
+            } catch (error) {
+                console.error("Error fetching popular parameters:", error);
+            }
+        };
+    
+        if (era && location && selectedGenre) {
+            fetchPopularParams();
+        }
+    }, [era, location, selectedGenre]);
+    
+    useEffect(() => {
+        console.log("Popular Parameters State:", popularParams);
+    }, [popularParams]);
+    
 
     return (
         <Container className="mt-4">
@@ -282,14 +313,41 @@ const EraYearComponent = () => {
                         selectedInstruments={selectedInstruments}
                         searchText={searchText} 
                         onSearchResults={setSongs} 
+                        onPopularParams={setPopularParams} 
                     />
                 </Col>
             </Row>
 
-            <SearchSongsComponent songs={songs} />
+            {/* Display popular parameters in a table */}
+            {Object.keys(popularParams).length > 0 && (
+                <div className="mt-4">
+                    <h3>Popular Parameters:</h3>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Most common key</td>
+                                <td>{popularParams.key}</td>
+                            </tr>
+                            <tr>
+                                <td>Most common BPM</td>
+                                <td>{popularParams.bpm}</td>
+                            </tr>
+                            {/* Add more rows for other parameters as needed */}
+                        </tbody>
+                    </Table>
+                </div>
+            )}
 
-            </Container>
-    );    
+<SearchSongsComponent songs={songs} />
+
+</Container>
+); 
 }
 
 export default EraYearComponent;
