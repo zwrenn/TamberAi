@@ -1,28 +1,33 @@
-/* SearchSongsComponent.css */
-
+/* Table styling */
 .song-table {
-    border: 1px solid #ccc;
-    padding: 20px;
-    margin-bottom: 20px;
-    overflow-x: auto; /* For horizontal scrolling if the table overflows the container width */
-}
-
-.song-table h2 {
-    font-size: 24px;
-    margin-bottom: 15px;
+    margin-top: 30px;
 }
 
 .song-table table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.song-table th, .song-table td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: left;
+.song-table th,
+.song-table td {
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #f5f5f5;
 }
 
 .song-table th {
-    background-color: #f2f2f2;
+    background-color: #34495e; /* Header background color */
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.song-table tbody tr:hover {
+    background-color: #f5f5f5; /* Light background on hover */
+}
+
+.song-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternate row color */
 }

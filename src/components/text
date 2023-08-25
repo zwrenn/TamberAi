@@ -1,0 +1,781 @@
+const express = require('express');
+const cors = require('cors'); 
+const bodyParser = require('body-parser');
+const app = express();
+const multer = require('multer');
+const csvParser = require('csv-parser');
+const fs = require('fs');
+const csv = require('fast-csv');
+const { Client } = require('pg');
+const fastcsv = require('fast-csv');
+const { Pool } = require('pg'); // Import the Pool class from the pg package
+
+const PORT = 5001;
+const pool = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'Tamber',
+    password: 'Wednesday@1240',
+    port: 5432,
+});
+
+// Middleware
+app.use(cors()); 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    },
+});
+const upload = multer({ storage: storage });
+
+
+const columnMapping = {
+    'Year': "year",
+    'Location': 'location',
+    'Artist': 'artist',
+    'Issue Date': 'Issue Date',
+    'Song': 'title',
+    'Key': 'key',
+    'Camelot': 'camelot',
+    'BPM': 'bpm',
+    'Duration': 'duration',
+    'Spotify Link': 'Spotify Link',
+    'Spotify URL': 'Spotify URL',
+    'Time Signature': 'Time Signature',
+    'Intro Length': 'Intro Length',
+    'Intro Instrumentation': 'Intro Instrumentation',
+    'Intro Chords': 'Intro Chords',
+    'Verse Length': 'Verse Length',
+    'Verse Instrumentation': 'Verse Instrumentation',
+    'Verse Chords': 'Verse Chords',
+    'Pre-Chorus Length': 'Pre-Chorus Length',
+    'Pre-Chorus Instrumentation': 'Pre-Chorus Instrumentation',
+    'Pre-Chorus Chords': 'Pre-Chorus Chords',
+    'Chorus Length': 'Chorus Length',
+    'Chorus Instrumentation': 'Chorus Instrumentation',
+    'Chorus Chords': 'Chorus Chords',
+    'Bridge Length': 'Bridge Length',
+    'Bridge Instrumentation': 'Bridge Instrumentation',
+    'Bridge Chords': 'Bridge Chords',
+    'Outro Length': 'Outro Length',
+    'Outro Instrumentation': 'Outro Instrumentation',
+    'Outro Chords': 'Outro Chords',
+    'Genre': 'genre',
+    'Intro InstrumentationJSON': 'Intro InstrumentationJSON',
+    'Verse InstrumentationJSON': 'Verse InstrumentationJSON',
+    'Pre-Chorus InstrumentationJSON': 'Pre-Chorus InstrumentationJSON',
+    'Chorus InstrumentationJSON': 'Chorus InstrumentationJSON',
+    'Bridge InstrumentationJSON': 'Bridge InstrumentationJSON',
+    'Outro InstrumentationJSON': 'Outro InstrumentationJSON',
+    'Secondary Genre': 'Secondary Genre',
+    'Era': 'era',
+    'Intro ChordsJSON': 'Intro ChordsJSON',
+    'Verse ChordsJSON': 'Verse ChordsJSON',
+    'Pre-Chorus ChordsJSON': 'Pre-Chorus ChordsJSON',
+    'Chorus ChordsJSON': 'Chorus ChordsJSON',
+    'Bridge ChordsJSON': 'Bridge ChordsJSON',
+    'Outro ChordsJSON': 'Outro ChordsJSON',
+   };
+
+// Test the database connection
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Error connecting to the database', err.stack);
+    } else {
+        console.log('Connected to the database', res.rows[0]);
+    }
+});
+
+async function getSongAttributes(songTitle) {
+    const result = await pool.query('SELECT * FROM songs WHERE title = $1', [songTitle]);
+    if (result.rows.length > 0) {
+        return result.rows[0];
+    }
+    return null;
+}
+
+// Popular instruments for given era and genre
+app.get('/api/popular-instruments', async (req, res) => {
+    const { era, genre, location, song, influence } = req.query;
+
+    let songAttributes = null;
+    if (song) {
+        songAttributes = await getSongAttributes(song);
+        if (songAttributes) {
+            // This is where you would modify results based on songAttributes and influence
+            // For now, we're just logging the attributes, but you can expand on this
+            console.log("Retrieved song attributes:", songAttributes);
+        }
+    }
+
+
+    console.log("Era:", era);
+    console.log("Genre:", genre);
+    console.log("Location:", location);
+    console.log("Song:", song);
+    console.log("Influence:", influence);
+
+    // Initialize the WHERE clause and values array
+    let whereConditions = [];
+    let values = [];
+
+    if (era) {
+        whereConditions.push(`s.era = $${values.length + 1}`);
+        values.push(era);
+    }
+
+    if (genre) {
+        whereConditions.push(`s.genre = $${values.length + 1}`);
+        values.push(genre);
+    }
+
+    if (location) {
+        whereConditions.push(`s.location = $${values.length + 1}`);
+        values.push(location);
+    }
+    
+    // If a song ID is provided, we might want to add conditions or join other tables based on song attributes.
+    if (song) {
+        // For example: (this is a placeholder and should be replaced with actual logic)
+        whereConditions.push(`s.attribute = $${values.length + 1}`);
+        values.push(song);
+    }
+
+    const whereClause = whereConditions.length ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    // Now, incorporate this dynamic WHERE clause into your SQL query
+    const query = `
+    WITH filtered_songs AS (
+        SELECT 
+            "Chorus InstrumentationJSON", 
+            "key", 
+            bpm, 
+            "camelot", 
+            "Verse Length", 
+            "Intro Length",
+            "Chorus Length",
+            "Bridge Length",
+            "Outro Length",
+            "Intro Instrumentation",
+            "Verse Instrumentation",
+            "Chorus Instrumentation",
+            "Bridge Instrumentation",
+            "Outro Instrumentation",
+            "Intro Chords",
+            "Verse Chords", 
+            "Chorus Chords", 
+            "Bridge Chords", 
+            "Outro Chords"
+        FROM songs s
+        JOIN genres g ON s.genre = g.genre_id
+        ${whereClause}
+    ),
+
+    keys_aggregated AS (
+        SELECT "key" AS key_id
+        FROM filtered_songs
+    ),
+
+    counted_keys AS (
+        SELECT key_id, COUNT(*) AS frequency
+        FROM keys_aggregated
+        GROUP BY key_id
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+    
+    bpm_aggregated AS (
+        SELECT bpm, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY bpm
+        ORDER BY frequency DESC
+        LIMIT 3
+    ),
+    
+    instruments_aggregated AS (
+        SELECT 
+        (regexp_matches("Chorus InstrumentationJSON", '(\\d+)'))[1]::integer AS instrument_id
+        FROM filtered_songs
+    ),
+    
+    counted_instruments AS (
+        SELECT instrument_id, COUNT(*) AS frequency
+        FROM instruments_aggregated
+        GROUP BY instrument_id
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+    
+    camelots_aggregated AS (
+        SELECT "camelot" AS camelot_id
+        FROM filtered_songs
+    ),
+    
+    counted_camelots AS (
+        SELECT camelot_id, COUNT(*) AS frequency
+        FROM camelots_aggregated
+        GROUP BY camelot_id
+        ORDER BY frequency DESC
+        LIMIT 5
+    ), 
+
+    verse_length_aggregated AS (
+        SELECT "Verse Length" AS length, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Verse Length"
+        ORDER BY frequency DESC
+        LIMIT 1
+    ),    
+    
+    intro_length_aggregated AS (
+        SELECT "Intro Length" AS length, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Intro Length"
+        ORDER BY frequency DESC
+        LIMIT 1
+    ),
+
+    chorus_length_aggregated AS (
+        SELECT "Chorus Length" AS length, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Chorus Length"
+        ORDER BY frequency DESC
+        LIMIT 1
+    ),    
+    
+    bridge_length_aggregated AS (
+        SELECT "Bridge Length" AS length, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Bridge Length"
+        ORDER BY frequency DESC
+        LIMIT 1
+    ),
+
+    outro_length_aggregated AS (
+        SELECT "Outro Length" AS length, COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Outro Length"
+        ORDER BY frequency DESC
+        LIMIT 1
+    ),
+
+    intro_instrument_combinations AS (
+        SELECT 
+            "Intro Instrumentation", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Intro Instrumentation"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    verse_instrument_combinations AS (
+        SELECT 
+            "Verse Instrumentation", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Verse Instrumentation"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    chorus_instrument_combinations AS (
+        SELECT 
+            "Chorus Instrumentation", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Chorus Instrumentation"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    Bridge_instrument_combinations AS (
+        SELECT 
+            "Bridge Instrumentation", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Bridge Instrumentation"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    outro_instrument_combinations AS (
+        SELECT 
+            "Outro Instrumentation", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Outro Instrumentation"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ), 
+
+    intro_chords AS (
+        SELECT 
+            "Intro Chords", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Intro Chords"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    verse_chords AS (
+        SELECT 
+            "Verse Chords", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Verse Chords"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ), 
+
+    chorus_chords AS (
+        SELECT 
+            "Chorus Chords", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Chorus Chords"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    bridge_chords AS (
+        SELECT 
+            "Bridge Chords", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Bridge Chords"
+        ORDER BY frequency DESC
+        LIMIT 5
+    ),
+
+    outro_chords AS (
+        SELECT 
+            "Outro Chords", 
+            COUNT(*) AS frequency
+        FROM filtered_songs
+        GROUP BY "Outro Chords"
+        ORDER BY frequency DESC
+        LIMIT 5
+    )
+
+    SELECT 
+    i.instrument_name::varchar AS name, ci.frequency, 'instrument' AS type
+FROM counted_instruments ci
+JOIN instruments i ON ci.instrument_id = i.instrument_id
+
+UNION ALL --
+
+SELECT 
+    ino."Intro Instrumentation" AS name, 
+    ino.frequency, 
+    'intro_combination' AS type
+FROM intro_instrument_combinations ino
+
+UNION ALL
+
+SELECT 
+    ver."Verse Instrumentation" AS name, 
+    ver.frequency, 
+    'verse_combination' AS type
+FROM verse_instrument_combinations ver
+
+UNION ALL
+
+SELECT 
+    cic."Chorus Instrumentation" AS name, 
+    cic.frequency, 
+    'chorus_combination' AS type
+FROM chorus_instrument_combinations cic
+
+UNION ALL
+
+SELECT 
+    br."Bridge Instrumentation" AS name, 
+    br.frequency, 
+    'bridge_combination' AS type
+FROM bridge_instrument_combinations br
+
+UNION ALL
+
+SELECT 
+    ot."Outro Instrumentation" AS name, 
+    ot.frequency, 
+    'outro_combination' AS type
+FROM outro_instrument_combinations ot
+
+UNION ALL
+
+SELECT 
+    ic."Intro Chords" AS name, 
+    ic.frequency, 
+    'intro_chord' AS type
+FROM intro_chords ic
+
+UNION ALL
+
+SELECT 
+    vr."Verse Chords" AS name, 
+    vr.frequency, 
+    'verse_chord' AS type
+FROM verse_chords vr
+
+UNION ALL
+
+SELECT 
+    chch."Chorus Chords" AS name, 
+    chch.frequency, 
+    'chorus_chord' AS type
+FROM chorus_chords chch
+
+UNION ALL
+
+SELECT 
+    brch."Bridge Chords" AS name, 
+    brch.frequency, 
+    'bridge_chord' AS type
+FROM bridge_chords brch
+
+UNION ALL
+
+SELECT 
+    otch."Outro Chords" AS name, 
+    otch.frequency, 
+    'outro_chord' AS type
+FROM outro_chords otch
+
+UNION ALL
+
+SELECT 
+    k.keyname AS name, ck.frequency, 'key' AS type
+FROM counted_keys ck
+JOIN keysignatures k ON ck.key_id = k.keysignatureid
+
+UNION ALL
+
+SELECT 
+    m.camelot_name AS name, mc.frequency, 'camelot' AS type
+FROM counted_camelots mc
+JOIN camelot m ON mc.camelot_id = m.camelot_id
+    UNION ALL
+    
+    SELECT 
+        bpm::text AS name, frequency, 'bpm' AS type
+    FROM bpm_aggregated
+
+    UNION ALL
+
+    SELECT 
+    vl.length::text AS name, vl.frequency, 'verse_length' AS type
+    FROM verse_length_aggregated vl
+    
+    UNION ALL
+
+    SELECT 
+    il.length::text AS name, il.frequency, 'intro_length' AS type
+    FROM intro_length_aggregated il
+
+    UNION ALL
+
+    SELECT 
+    hl.length::text AS name, hl.frequency, 'chorus_length' AS type
+    FROM chorus_length_aggregated hl
+    
+    UNION ALL
+
+    SELECT 
+    bl.length::text AS name, bl.frequency, 'bridge_length' AS type
+    FROM bridge_length_aggregated bl
+
+    UNION ALL
+
+    SELECT 
+    ol.length::text AS name, ol.frequency, 'outro_length' AS type
+    FROM outro_length_aggregated ol
+
+    ORDER BY frequency DESC;    
+    `;
+
+    console.log("Executing SQL:", query);
+
+    try {
+        const { rows } = await pool.query(query, values);          
+        
+        const instruments = rows.filter(row => row.type === 'instrument');
+        const keys = rows.filter(row => row.type === 'key');
+        const bpms = rows.filter(row => row.type === 'bpm');
+        const camelots = rows.filter(row => row.type === 'camelot');
+        const verse_lengths = rows.filter(row => row.type === 'verse_length');
+        const intro_lengths = rows.filter(row => row.type === 'intro_length');
+        const chorus_lengths = rows.filter(row => row.type === 'chorus_length');
+        const bridge_lengths = rows.filter(row => row.type === 'bridge_length');
+        const outro_lengths = rows.filter(row => row.type === 'outro_length');
+        const intro_combinations = rows.filter(row => row.type === 'intro_combination');
+        const verse_combinations = rows.filter(row => row.type === 'verse_combination');
+        const chorus_combinations = rows.filter(row => row.type === 'chorus_combination');
+        const bridge_combinations = rows.filter(row => row.type === 'bridge_combination');
+        const outro_combinations = rows.filter(row => row.type === 'outro_combination');
+        const intro_chords = rows.filter(row => row.type === 'intro_chord');
+        const verse_chords = rows.filter(row => row.type === 'verse_chord');
+        const chorus_chords = rows.filter(row => row.type === 'chorus_chord');
+        const bridge_chords = rows.filter(row => row.type === 'bridge_chord');
+        const outro_chords = rows.filter(row => row.type === 'outro_chord');
+
+        // After obtaining results, adjust based on influence
+        if (song && influence) {
+            // Retrieve the song attributes (for the sake of the example, only key is considered)
+            const songAttributes = await getSongAttributes(song);  // Assuming this function fetches the song's attributes
+
+            // Adjust the frequency for the song's key based on influence
+            const keyRow = rows.find(row => row.type === 'key' && row.name === songAttributes.key);
+            if (keyRow) {
+                // Increase the frequency based on influence
+                // This is a simple approach; you can refine the formula as needed
+                keyRow.frequency += Math.round(keyRow.frequency * (influence / 100));
+            }
+        }
+
+
+res.json({
+    instruments,
+    keys,
+    bpms,
+    camelots,
+    verse_lengths,
+    intro_lengths,
+    chorus_lengths,
+    bridge_lengths,
+    outro_lengths,
+    intro_combinations,
+    verse_combinations,
+    chorus_combinations, 
+    bridge_combinations,
+    outro_combinations,
+    intro_chords,
+    verse_chords, 
+    chorus_chords, 
+    bridge_chords, 
+    outro_chords, 
+
+    // ... Include the other song sections ...
+});
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+});
+
+
+// songs
+app.get('/api/songs', async (req, res) => {
+    let query = 'SELECT * FROM songs';  // Initialize the base query here
+    try {
+        console.log("Received query parameters:", req.query); // Log all received query parameters
+
+        // Instead of destructuring, get the parameters directly
+        const era = req.query.era;
+        const chartPos = req.query.chartPos;
+        const key = req.query.key;
+        const genre = req.query.genre;
+        const bpm = req.query.bpm;
+        const instruments = req.query.instruments;
+        const chords = req.query.chords;
+        const location = req.query.location;  // Get the location parameter directly
+
+        let values = [];
+
+        if (era) {
+            query += ' WHERE era = $1';
+            values.push(era);
+        }
+        if (chartPos) {
+            if (values.length) {
+                query += ' AND "Chart Pos" = $' + (values.length + 1);
+            } else {
+                query += ' WHERE "Chart Pos" = $1';
+            }
+            values.push(chartPos);
+        }
+        if (key) {
+            query += (values.length ? ' AND' : ' WHERE') + ' key = $' + (values.length + 1);
+            values.push(key);
+        }
+        if (genre) {
+            query += (values.length ? ' AND' : ' WHERE') + ' genre = $' + (values.length + 1);
+            values.push(genre);
+        }
+        if (bpm) {
+            const minBpm = Number(bpm) - 5;
+            const maxBpm = Number(bpm) + 5;
+            query += (values.length ? ' AND' : ' WHERE') + ' bpm BETWEEN $' + (values.length + 1) + ' AND $' + (values.length + 2);
+            values.push(minBpm, maxBpm);
+        }
+
+        if (location) {
+            query += (values.length ? ' AND' : ' WHERE') + ' location = $' + (values.length + 1);
+            values.push(location);
+        }
+
+        if (instruments) {
+            let parsedInstruments = JSON.parse(instruments);  // Convert the string back to an array
+            let instrumentConditions = [];
+            
+            if (parsedInstruments.length > 0) {
+                parsedInstruments.forEach((instrumentId) => {
+                    let condition = `("Chorus InstrumentationJSON" LIKE '%${instrumentId}%' OR 
+                                      "Verse InstrumentationJSON" LIKE '%${instrumentId}%')`;
+                    instrumentConditions.push(condition);
+                });
+                
+                let allInstrumentConditions = instrumentConditions.join(' AND ');
+                
+                if (values.length) {
+                    query += ' AND (' + allInstrumentConditions + ')';
+                } else {
+                    query += ' WHERE (' + allInstrumentConditions + ')';
+                }
+            }
+        }
+
+        if (chords) {
+            let parsedChords = chords.split(',').map(chord => chord.trim()); // Convert the comma-separated string to an array
+            let chordConditions = [];
+        
+            if (parsedChords.length > 0) {
+                parsedChords.forEach((chordId) => {
+                    let condition = `("Chorus ChordsJSON" LIKE '%${chordId}%' OR 
+                                      "Verse ChordsJSON" LIKE '%${chordId}%')`;
+                    chordConditions.push(condition);
+                });
+        
+                let allChordConditions = chordConditions.join(' AND ');
+        
+                if (values.length) {
+                    query += ' AND (' + allChordConditions + ')';
+                } else {
+                    query += ' WHERE (' + allChordConditions + ')';
+                }
+            }
+        }        
+        
+        
+        console.log("All query parameters:", req.query);
+        
+
+// query += ' LIMIT 100';
+
+const result = await pool.query(query, values);
+res.json(result.rows);
+} catch (err) {
+console.error("Error during the query execution:", err.message, "Executed query:", query);
+res.status(500).send('Server error');
+}
+});
+
+// songs id
+app.get('/api/songs/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('SELECT * FROM songs WHERE id = $1', [id]);
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).send('Song not found');
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// key signature mapping
+app.get('/api/keysignatures', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT keysignatureid, keyname FROM keysignatures');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+
+// instrument mapping
+app.get('/api/instruments', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM instruments WHERE instrument_id != $1', ['0']);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// Define the Camelot endpoint
+app.get('/api/camelot', async (req, res) => {
+    try {
+      const query = 'SELECT camelot_id, camelot_name FROM camelot';
+      const result = await pool.query(query);
+      const camelotValues = result.rows;
+      res.json(camelotValues);
+    } catch (error) {
+      console.error('Error fetching Camelot values:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
+
+// genre mapping
+app.get('/api/genres', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT genre_id, genre_name FROM genres WHERE genre_id != $1', ['32']);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+
+// song mapping (fetch)
+app.get('/api/fetch-songs', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT title AS "Song", artist FROM songs');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// artist mapping (fetch)
+app.get('/api/fetch-artists', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT DISTINCT artist FROM songs ORDER BY artist');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// country mapping (fetch)
+app.get('/api/countries', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT country_id, CountryName FROM countries ORDER BY CountryName');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});

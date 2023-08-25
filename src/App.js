@@ -6,6 +6,8 @@ import CreateComponent from './components/CreateComponent';
 import CSVUpload from './components/CSVUpload';  // Import the CSVUpload component
 import { Container, Navbar, Nav } from 'react-bootstrap';
 
+
+
 function App() {
     return (
         <Router>
@@ -19,7 +21,7 @@ function App() {
                             <Nav className="me-auto">
                                 <Nav.Link as={Link} to="/">Search</Nav.Link>
                                 <Nav.Link as={Link} to="/create">Create</Nav.Link>
-                                <Nav.Link as={Link} to="/upload">Upload CSV</Nav.Link>  {/* New navigation link for uploading CSV */}
+                                <Nav.Link as={Link} to="/upload">Upload CSV</Nav.Link> {/* New navigation link for uploading CSV */}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>

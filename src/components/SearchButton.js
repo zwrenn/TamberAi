@@ -9,6 +9,7 @@ const SearchButton = ({
     selectedKey,
     selectedGenre,
     bpm,
+    selectedCamelotId,
     selectedChords,
     selectedInstruments,
     onSearchResults,
@@ -36,8 +37,8 @@ const SearchButton = ({
 
         if (selectedKey && selectedKey.id) {
             url += `key=${selectedKey.id}&`;
-        }
-    
+        }               
+
         if (selectedGenre) {
             url += `genre=${selectedGenre}&`;
         }
@@ -45,6 +46,11 @@ const SearchButton = ({
         if (bpm) {
             url += `bpm=${bpm}&`;
         }
+
+        if (selectedCamelotId) {
+            url += `camelot=${selectedCamelotId.id}&`; // Assuming selectedCamelotId is an object with an "id" property
+        }
+               
     
         if (selectedInstruments && selectedInstruments.length > 0) {
             url += `instruments=${JSON.stringify(selectedInstruments)}&`;

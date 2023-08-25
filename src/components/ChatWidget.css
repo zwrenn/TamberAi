@@ -1,0 +1,63 @@
+.chat-container {
+    width: 500px; /* Increased width */
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    font-family: 'Arial', sans-serif;
+    color: #eee;
+  }
+  
+  .messages {
+    height: 500px; /* Set a fixed height */
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .message {
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  
+  .message.user {
+    background-color: #555; /* slightly lighter gray for user messages */
+    text-align: right;
+    color: #ddd; /* lighter text color for better readability */
+  }
+  
+  .message.bot {
+    background-color: #2a2a2a; /* darker shade for bot messages */
+    color: #ccc; /* lighter text color for better readability */
+  }
+  
+  .input-form {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-form input {
+    flex: 1;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    margin-right: 5px;
+    background-color: #444; /* input background color */
+    color: #ddd; /* input text color */
+  }
+  
+  .input-form button {
+    background-color: #555;
+    border: none;
+    color: #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .input-form button:hover {
+    background-color: #666;
+  }
+  

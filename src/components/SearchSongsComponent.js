@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const SearchSongsComponent = ({ songs, keysignatures, genres, countries }) => {
+const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot }) => {
     const keynameMap = {};
     keysignatures.forEach(keysignature => {
         keynameMap[keysignature.keysignatureid] = keysignature.keyname;
@@ -12,13 +12,18 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries }) => {
         genreNameMap[genre.genre_id] = genre.genre_name;
     });
 
-    const countryNameMap = {}; // Create a map for country names
+    const countryNameMap = {};
     countries.forEach(country => {
         countryNameMap[country.country_id] = country.countryname;
     });
 
+    const camelotNameMap = {};
+    camelot.forEach(camelot => {
+        camelotNameMap[camelot.camelot_id] = camelot.camelot_name;
+    });
+
     return (
-        <div className="song-table">
+         <div className="song-table">
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
@@ -28,6 +33,7 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries }) => {
                         <th>Genre</th>
                         <th>BPM</th>
                         <th>Key</th>
+                        <th>Camelot</th>
                         <th>Intro Chords</th>
                         <th>Intro Length</th>
                         <th>Intro Instrumentation</th>
@@ -54,12 +60,13 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries }) => {
                 <tbody>
                     {songs.map(song => (
                         <tr key={song.id}>
-                            <td>{song.title}</td>
+                            <td><a href={song['Spotify URL']} target="_blank" rel="noopener noreferrer">{song.title}</a></td>
                             <td>{song.artist}</td>
                             <td>{song.year}</td>
                             <td>{genreNameMap[song.genre] || 'Unknown'}</td>
                             <td>{song.bpm}</td>
                             <td>{keynameMap[song.key] || 'Unknown'}</td>
+                            <td>{camelotNameMap[song.camelot] || 'Unknown'}</td>
                             <td>{song["Intro Chords"]}</td>
                             <td>{song["Intro Length"]}</td>
                             <td>{song["Intro Instrumentation"]}</td>

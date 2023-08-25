@@ -1,0 +1,13 @@
+h2.display-4 {
+    font-weight: bolder;
+    margin-bottom: 0.5rem; /* Reducing space between title and subtitle */
+  }
+  
+  p.lead {
+    font-size: 1.4rem; /* Making the subtitle slightly larger */
+  }
+  
+  .rounded {
+    border-radius: 15px; /* Making the corners slightly more rounded */
+  }
+  

@@ -1,17 +1,19 @@
-// CSVUpload.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
 function CSVUpload() {
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState([]);
 
     const onFileChange = (e) => {
-        setFile(e.target.files[0]);
+        setFiles([...e.target.files]);
     };
 
     const onUpload = async () => {
         const formData = new FormData();
-        formData.append('csv', file);
+
+        files.forEach((file) => {
+            formData.append('csv', file); // csv0, csv1, ...
+        });
 
         try {
             const response = await axios.post('/api/upload-csv', formData);
@@ -23,7 +25,7 @@ function CSVUpload() {
 
     return (
         <div>
-            <input type="file" accept=".csv" onChange={onFileChange} />
+            <input type="file" accept=".csv" multiple onChange={onFileChange} />
             <button onClick={onUpload}>Upload</button>
         </div>
     );

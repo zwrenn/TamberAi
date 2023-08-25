@@ -6,6 +6,49 @@ import Select from 'react-select';
 import SearchSongsComponent from './SearchSongsComponent';
 import './EraYearComponent.css';
 
+const darkThemeStyles = {
+    control: (base, state) => ({
+        ...base,
+        backgroundColor: '#3b3b3b',
+        borderColor: state.isFocused ? '#61dafb' : '#282c34',
+        boxShadow: state.isFocused ? '0 0 0 1px #61dafb' : null,
+        "&:hover": {
+            borderColor: '#61dafb'
+        }
+    }),
+    menu: base => ({
+        ...base,
+        backgroundColor: '#282c34',
+        color: '#eee'
+    }),
+    option: (base, state) => ({
+        ...base,
+        backgroundColor: state.isFocused ? '#3b3b3b' : null,
+        color: state.isFocused ? '#eee' : base.color
+    }),
+    singleValue: base => ({
+        ...base,
+        color: '#eee'
+    }),
+    multiValue: base => ({
+        ...base,
+        backgroundColor: '#3b3b3b',
+        color: '#eee'
+    }),
+    multiValueLabel: base => ({
+        ...base,
+        color: '#eee'
+    }),
+    multiValueRemove: base => ({
+        ...base,
+        color: '#eee',
+        "&:hover": {
+            backgroundColor: '#61dafb',
+            color: '#1a1a1a'
+        }
+    })
+};
+
 
 const EraYearComponent = () => {
     const [era, setEra] = useState('');
@@ -26,6 +69,9 @@ const EraYearComponent = () => {
     const [searchText, setSearchText] = useState('');
     const [commonInstruments, setCommonInstruments] = useState([]);
     const [popularParams, setPopularParams] = useState({});
+    const [camelot, setCamelot] = useState([]);
+    const [selectedCamelotId, setSelectedCamelotId] = useState('');
+
 
    // Initialize the filtered songs state with all songs
     const [filteredSongs, setFilteredSongs] = useState(songs);
@@ -42,6 +88,24 @@ const EraYearComponent = () => {
         setFilteredSongs(filtered);
     }, [songs, searchText]);
     
+    
+    const fetchPopularParams = async () => {
+        try {
+            const response = await fetch(`http://localhost:5001/api/popular-params?era=${era}&country=${location}&genre=${selectedGenre}&key=${selectedKey.value}`);
+            
+            const data = await response.json();
+            console.log("Fetched popular parameters:", data);
+            setPopularParams(data);
+    
+        } catch (error) {
+            console.error("Error fetching popular parameters:", error);
+        }
+    };
+    
+    if (era && location && selectedGenre && selectedKey.value) {
+        fetchPopularParams();
+    }
+    
 
     const handleEraChange = (e) => {
         const selectedEra = e.target.value;
@@ -53,6 +117,20 @@ const EraYearComponent = () => {
         setSearchText(newText);
         console.log("Updated search text:", newText); // Add this line
     };
+
+    useEffect(() => {
+        const fetchCamelotValues = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/api/camelot');
+                const data = await response.json();
+                setCamelot(data);
+            } catch (error) {
+                console.error('Error fetching Camelot values:', error);
+            }
+        };
+
+        fetchCamelotValues();
+    }, []);
 
     useEffect(() => {
         const fetchCommonInstruments = async () => {
@@ -153,12 +231,12 @@ const EraYearComponent = () => {
     
 
     return (
-        <Container className="mt-4">
-            <h2> Advanced Search </h2>
+        <Container className="mt-4 shadow">
+            <h2 className="text-center mb-4">Advanced Search</h2>
     
             {/* First Row */}
-            <Row>
-                <Col md={4}>
+            <Row className="mb-3">
+                <Col md={3}>
                     <Form.Group controlId="era">
                         <Form.Label>Era:</Form.Label>
                         <Form.Control as="select" value={era} onChange={handleEraChange}>
@@ -171,55 +249,33 @@ const EraYearComponent = () => {
                             <option value="2000s">2000s</option>
                             <option value="2010s">2010s</option>
                             <option value="2020s">2020s</option>
+                            </Form.Control>
+                    </Form.Group>
+                </Col>
+
+                <Col md={3}>
+                    <Form.Group controlId="key">
+                        <Form.Label>Key:</Form.Label>
+                        <Form.Control 
+                            as="select" 
+                            value={selectedKey.value} 
+                            onChange={e => {
+                                const selectedKeyName = e.target.value;
+                                const selectedKeyId = keys.find(key => key.keyname === selectedKeyName)?.keysignatureid || "";
+                                setSelectedKey({ value: selectedKeyName, id: selectedKeyId });
+                            }}
+                        >
+                            <option value="">--Select a Key--</option>
+                            {keys.map(key => (
+                                <option key={key.keysignatureid} value={key.keyname}>
+                                    {key.keyname}
+                                </option>
+                            ))}
                         </Form.Control>
                     </Form.Group>
                 </Col>
-    
-                <Col md={4}>
-                    <Form.Group controlId="instruments">
-                        <Form.Label>Instruments:</Form.Label>
-                        <Select 
-                            isMulti
-                            options={instruments.map(instrument => ({ value: instrument.instrument_id, label: instrument.instrument_name }))}
-                            onChange={selectedOptions => {
-                                const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
-                                setSelectedInstruments(selectedValues);
-                            }}
-                        />
-                    </Form.Group>
-                </Col>
-    
-                <Col md={4}>
-                    <Form.Group controlId="chords">
-                        <Form.Label>Chords:</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            value={selectedChords.join(', ')} 
-                            onChange={e => {
-                                const inputText = e.target.value;
-                                const chordsArray = inputText.split(',').map(chord => chord.trim());
-                                setSelectedChords(chordsArray);
-                            }}
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
-    
-            {/* Second Row */}
-            <Row>
-                <Col md={4}>
-                    <Form.Group controlId="searchText">
-                        <Form.Label>Search Text:</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            value={searchText}
-                            onChange={handleSearchTextChange}
-                            placeholder="Enter artist or song"
-                        />
-                    </Form.Group>
-                </Col>
-    
-                <Col md={4}>
+
+                <Col md={3}>
                     <Form.Group controlId="location">
                         <Form.Label>Location:</Form.Label>
                         <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
@@ -232,32 +288,8 @@ const EraYearComponent = () => {
                         </Form.Control>
                     </Form.Group>
                 </Col>
-    
-                <Col md={4}>
-                    <Form.Group controlId="key">
-                        <Form.Label>Key:</Form.Label>
-                        <Form.Control 
-                            as="select" 
-                            value={selectedKey} 
-                            onChange={e => {
-                                console.log("Selected value:", e.target.value); // Log for debugging
-                                setSelectedKey(e.target.value);
-                            }}
-                        >
-                            <option value="">--Select a Key--</option>
-                            {keys.map(key => (
-                                <option key={key.keysignatureid} value={key.keyname}>
-                                    {key.keyname}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-            </Row>
-    
-            {/* Third Row */}
-            <Row>
-                <Col md={4}>
+
+                <Col md={3}>
                     <Form.Group controlId="bpm">
                         <Form.Label>BPM:</Form.Label>
                         <Form.Control 
@@ -268,8 +300,23 @@ const EraYearComponent = () => {
                         />
                     </Form.Group>
                 </Col>
-    
-                <Col md={4}>
+                
+                <Col md={3}>
+                <Form.Group controlId="instruments">
+                    <Form.Label>Instruments:</Form.Label>
+                    <Select 
+                        isMulti
+                        options={instruments.map(instrument => ({ value: instrument.instrument_id, label: instrument.instrument_name }))}
+                        onChange={selectedOptions => {
+                            const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                            setSelectedInstruments(selectedValues);
+                        }}
+                        styles={darkThemeStyles}  // Apply the custom styles here
+                    />
+                </Form.Group>
+                </Col>
+
+                <Col md={3}>
                     <Form.Group controlId="genre">
                         <Form.Label>Genre:</Form.Label>
                         <Form.Control as="select" value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
@@ -283,21 +330,74 @@ const EraYearComponent = () => {
                     </Form.Group>
                 </Col>
     
-                <Col md={4}>
+                <Col md={3}>
                     <ChartPositionComponent position={chartPos} setPosition={setChartPos} />
+                </Col>
+
+                <Col md={3}>
+                    <Form.Group controlId="camelot">
+                        <Form.Label>Camelot:</Form.Label>
+                        <Form.Control 
+                            as="select" 
+                            value={selectedCamelotId.value} 
+                            onChange={e => {
+                                const selectedCamelotName = e.target.value;
+                                const selectedCamelotId = camelot.find(camelot => camelot.camelot_name === selectedCamelotName)?.camelot_id || "";
+                                setSelectedCamelotId({ value: selectedCamelotName, id: selectedCamelotId });
+                            }}
+                        >
+                            <option value="">--Select a Camelot--</option>
+                            {camelot.map(camelotItem => (
+                                <option camelot={camelotItem.camelot_id} value={camelotItem.camelot_name}>
+                                    {camelotItem.camelot_name}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+            </Row>
+            
+          <Row className="mb-3">
+    
+          <Col md={6}>
+                    <Form.Group controlId="chords">
+                        <Form.Label>Chords:</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={selectedChords.join(', ')} 
+                            onChange={e => {
+                                const inputText = e.target.value;
+                                const chordsArray = inputText.split(',').map(chord => chord.trim());
+                                setSelectedChords(chordsArray);
+                            }}
+                        />
+                    </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                    <Form.Group controlId="searchText">
+                        <Form.Label>Search Text:</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            value={searchText}
+                            onChange={handleSearchTextChange}
+                            placeholder="Enter artist or song"
+                        />
+                    </Form.Group>
                 </Col>
             </Row>
     
-            <Row style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-                <Col>
+            <Row className="mt-4 mb-4">
+                <Col className="text-center">
                     <SearchButton 
-                        variant="primary"
+                        className="custom-btn" // Apply the custom class
                         era={era} 
                         chartPos={chartPos} 
                         location={location} 
                         selectedKey={selectedKey} 
                         selectedGenre={selectedGenre} 
                         bpm={bpm}
+                        selectedCamelotId={selectedCamelotId}
                         selectedChords={selectedChords} 
                         selectedInstruments={selectedInstruments}
                         searchText={searchText} 
@@ -307,7 +407,7 @@ const EraYearComponent = () => {
                 </Col>
             </Row>
     
-            <SearchSongsComponent songs={filteredSongs} keysignatures={keys} genres={genres} countries={countries} />
+            <SearchSongsComponent songs={filteredSongs} keysignatures={keys} genres={genres} countries={countries} camelot={camelot} />
     
         </Container>
     );

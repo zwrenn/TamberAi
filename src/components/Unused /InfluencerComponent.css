@@ -1,0 +1,96 @@
+/* General Container */
+.influencer-component {
+    border-radius: 15px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Lighten the shadow for a more subtle effect */
+    padding: 30px; /* Increase padding for more space */
+    background-color: #1e1e1e;
+    margin-top: 30px; /* Increase margin for separation */
+}
+
+/* Increase space between rows */
+.top-row, .bottom-row {
+    margin-bottom: 25px;
+}
+
+/* Styling for input fields, dropdowns, and sliders */
+.influencer-component .form-group {
+    margin-bottom: 15px; /* Increase spacing between form groups */
+}
+
+.influencer-component .form-label {
+    font-weight: bold; /* Bold labels */
+    font-size: 1.1em; /* Increase label size */
+    color: #fff;
+    margin-bottom: 10px; /* Separate label from input */
+}
+
+.influencer-component .form-control {
+    padding: 12px 15px; /* Increase padding for a more spacious feel */
+    border: 1px solid #444; /* Slightly lighter border */
+    border-radius: 5px;
+    background-color: #2a2a2a;
+    width: 100%;
+    color: #fff;
+    transition: border 0.2s; /* Transition effect for hover */
+}
+
+.influencer-component .form-control:hover {
+    border-color: #007bff; /* Change border color on hover */
+}
+
+/* Styling for buttons */
+.influencer-component .btn-search {
+    background-color: #007bff;
+    border-color: #0056b3; /* Darker border for depth */
+    color: #fff;
+    padding: 12px 20px; /* Increase padding for a larger button */
+    transition: background-color 0.2s; /* Transition effect for hover */
+}
+
+.influencer-component .btn-search:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Styling for table */
+.common-table {
+    border: 1px solid #444; /* Slightly lighter border */
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    background-color: #2a2a2a;
+}
+
+.common-table h3 {
+    font-size: 24px;
+    margin-bottom: 20px; /* Increase spacing */
+    color: #fff;
+    font-weight: bold; /* Bold title */
+}
+
+.common-table table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.common-table th, .common-table td {
+    border: 1px solid #555;
+    padding: 12px 15px; /* Increase padding */
+    text-align: left;
+    color: #fff;
+}
+
+.common-table th {
+    background-color: #333;
+}
+
+/* Alternate colors for table rows for better readability */
+.common-table tr:nth-child(even) {
+    background-color: #3a3a3a;
+}
+
+@media (min-width: 1200px) {
+    .influencer-component {
+        max-width: 90%;
+    }
+}

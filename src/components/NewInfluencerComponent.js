@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Container, Row, Col, Button as BootstrapButton, Table } from 'react-bootstrap';
 
-const InfluencerComponent = () => {
+
+const NewInfluencerComponent = () => {
     const [era, setEra] = useState('');
     const [year, setYear] = useState(1958);
     const [songs, setSongs] = useState([]);
@@ -30,7 +31,25 @@ const InfluencerComponent = () => {
     const [commonOutroChords, setCommonOutroChords] = useState([]);
     const [isEraDisabled, setIsEraDisabled] = useState(false);
     const [isYearDisabled, setIsYearDisabled] = useState(false);
+    const [selectedSong, setSelectedSong] = useState("None");
+    const [influenceValue, setInfluenceValue] = useState(0);
 
+
+    useEffect(() => {
+        const fetchAllSongs = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/api/songs');
+                const allSongs = await response.json();
+                console.log("Fetched all songs:", allSongs);  // This will show you the data
+                setSongs(allSongs);
+            } catch (error) {
+                console.error('Error fetching all songs:', error);
+            }
+        };
+    
+        fetchAllSongs();
+    }, []);
+    
     useEffect(() => {
         const fetchGenres = async () => {
             try {
@@ -61,6 +80,7 @@ const InfluencerComponent = () => {
     }, []);
 
     const updateYear = async (selectedYear) => {
+        console.log("Updating year...");
         try {
             const response = await fetch('http://localhost:5001/api/updateYear', {
                 method: 'POST',
@@ -92,30 +112,38 @@ const InfluencerComponent = () => {
         console.log("era:", era);
         console.log("selectedGenre:", selectedGenre);
         console.log("location:", location);
+        console.log("selectedSong:", selectedSong);
+        console.log("influenceValue:", influenceValue);
         
         try {
             let apiUrl = `http://localhost:5001/api/popular-instruments?`;
-    
+        
             if (era) {
-                apiUrl += `era=${era}`;
+                apiUrl += `era=${era}&`;
             }
-    
+        
             if (selectedGenre) {
-                if (era) {
-                    apiUrl += `&`;
-                }
-                apiUrl += `genre=${selectedGenre}`;
+                apiUrl += `genre=${selectedGenre}&`;
             }
-    
+        
             if (location) {
-                if (era || selectedGenre) {
-                    apiUrl += `&`;
-                }
-                apiUrl += `location=${location}`;
+                apiUrl += `location=${location}&`;
             }
+            
+            if (selectedSong !== "None") {
+                apiUrl += `song=${selectedSong}&`;
+            }
+
+            if (typeof influenceValue !== 'undefined') {
+                apiUrl += `influence=${influenceValue}`;
+            }            
     
+            // Log the final API URL here
+            console.log("Final API URL:", apiUrl);
             const response = await fetch(apiUrl);
             const data = await response.json();
+            // Log the received data
+            console.log("Received data from backend:", data);
 
             setCommonKeys(data.keys);
             setCommonBPMs(data.bpms);
@@ -136,6 +164,11 @@ const InfluencerComponent = () => {
             setCommonChorusChords(data.chorus_chords);
             setCommonBridgeChords(data.bridge_chords);
             setCommonOutroChords(data.outro_chords);
+            setCommonVerseLengths(data.verse_lengths);
+            setCommonChorusLengths(data.chorus_lengths);
+            setCommonBridgeLengths(data.bridge_lengths);
+            setCommonIntroLengths(data.intro_lengths);
+            setCommonOutroLengths(data.outro_lengths);
 
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -143,9 +176,13 @@ const InfluencerComponent = () => {
     };
     
     
+    console.log("Songs Data:", songs);
+
     return (
         <Container className="mt-4 influencer-component">
-            <Row className="top-row">
+            <h2 className="mb-4">Influence Search</h2>
+
+            <Row className="mb-3 justify-content-center">
                 <Col md={3}>
                     <Form.Group controlId="era">
                         <Form.Label>Era:</Form.Label>
@@ -159,11 +196,11 @@ const InfluencerComponent = () => {
                             <option value="2000s">2000s</option>
                             <option value="2010s">2010s</option>
                             <option value="2020s">2020s</option>
-                            </Form.Control>
+                        </Form.Control>
                     </Form.Group>
                 </Col>
-            
-                <Col md={2}>
+
+                <Col md={3}>
                     <Form.Group controlId="year">
                         <Form.Label>Year: {year}</Form.Label>
                         <Form.Control 
@@ -175,35 +212,12 @@ const InfluencerComponent = () => {
                             onChange={e => {
                                 const selectedYear = e.target.value;
                                 setYear(selectedYear);
-                                updateYear(selectedYear); // Call the API to update the year
-                                if (selectedYear === "1958") { // Replace with your default year if different
-                                    setIsEraDisabled(false); // Enable era dropdown
-                                } else {
-                                    setIsEraDisabled(true); // Disable era dropdown
-                                    setIsYearDisabled(false); // Ensure year slider is enabled
-                                }
+                                // Update year-related state or perform necessary logic
                             }}
                         />
                     </Form.Group>
                 </Col>
-            </Row>
-
-            <Row className="bottom-row">
-                <Col md={2}>
-                    <Form.Group controlId="location">
-                        <Form.Label>Location:</Form.Label>
-                        <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
-                            <option value="">--Select a Country</option>
-                            {countries.map(country => (
-                                <option key={country.country_id} value={country.country_id}>
-                                    {country.countryname}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-
-                <Col md={2}>
+                <Col md={3}>
                     <Form.Group controlId="genre">
                         <Form.Label>Genre:</Form.Label>
                         <Form.Control as="select" value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
@@ -218,17 +232,58 @@ const InfluencerComponent = () => {
                 </Col>
             </Row>
 
-            <Row style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-                <Col>
-                <BootstrapButton onClick={fetchCommonData}>Search Common Data</BootstrapButton>
+            <Row className="mb-3 justify-content-center">
+                <Col md={3}>
+                    <Form.Group controlId="location">
+                        <Form.Label>Location:</Form.Label>
+                        <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
+                            <option value="">--Select a Country</option>
+                            {countries.map(country => (
+                                <option key={country.country_id} value={country.country_id}>
+                                    {country.countryname}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+                <Col md={3}>
+                    <Form.Group controlId="song">
+                        <Form.Label>Select a Song to Influence:</Form.Label>
+                        <Form.Control as="select" value={selectedSong} onChange={e => setSelectedSong(e.target.value)}>
+                            <option value={null}>None</option>
+                            {songs.map(song => (
+                                <option key={song.id} value={song.id}>
+                                    {song.title} - {song.artist}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+                <Col md={3}>
+                    <Form.Group controlId="influence">
+                        <Form.Label>Influence Level: {influenceValue}%</Form.Label>
+                        <Form.Control 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={influenceValue}
+                            onChange={e => setInfluenceValue(e.target.value)}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
+            
+            <Row className="mb-4 justify-content-center">
+                <Col md={4} className="text-center">
+                    <BootstrapButton onClick={fetchCommonData} size="lg" className="btn-search">Search Common Data</BootstrapButton>
                 </Col>
             </Row>
 
             <div className="common-table">
-            <h3>Most Common</h3>
-            <Table striped bordered hover responsive key={Math.random()}>
-                <thead>
-                    <tr>
+                <h3>Most Common</h3>
+                <Table striped bordered hover responsive key={Math.random()}>
+                    <thead>
+                        <tr>
                         <th>Key</th>
                         <th>Camelot</th>
                         <th>BPM</th>
@@ -350,4 +405,6 @@ const InfluencerComponent = () => {
     );
 }
 
-export default InfluencerComponent;
+export default NewInfluencerComponent;
+
+
