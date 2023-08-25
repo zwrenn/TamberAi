@@ -1,8 +1,9 @@
 .influencer-component {
-    border: 1px solid #ccc;
+    border-radius: 15px;
+    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 20px;
-    overflow-x: auto; /* For horizontal scrolling if the component overflows container width */
+    background-color: #ffffff; /* You can adjust this color if needed */
+    margin-top: 20px; /* To ensure the container doesn't sit right at the top of its parent */
 }
 
 .influencer-component .era-year,
@@ -20,4 +21,40 @@
     margin-bottom: 10px;
 }
 
-/* You can continue with more specific styles as needed */
+.common-table {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* For horizontal scrolling if the table overflows the container width */
+}
+
+.common-table h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.common-table table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;  /* Add this line */
+}
+
+.common-table td {
+    word-wrap: break-word;
+}
+
+.common-table th, .common-table td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
+}
+
+.common-table th {
+    background-color: #f2f2f2;
+}
+
+@media (min-width: 1200px) {
+    .influencer-component {
+        max-width: 90%;
+    }
+}

@@ -1,7 +1,22 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const SearchSongsComponent = ({ songs }) => {
+const SearchSongsComponent = ({ songs, keysignatures, genres, countries }) => {
+    const keynameMap = {};
+    keysignatures.forEach(keysignature => {
+        keynameMap[keysignature.keysignatureid] = keysignature.keyname;
+    });
+
+    const genreNameMap = {};
+    genres.forEach(genre => {
+        genreNameMap[genre.genre_id] = genre.genre_name;
+    });
+
+    const countryNameMap = {}; // Create a map for country names
+    countries.forEach(country => {
+        countryNameMap[country.country_id] = country.countryname;
+    });
+
     return (
         <div className="song-table">
             <Table striped bordered hover responsive>
@@ -42,9 +57,9 @@ const SearchSongsComponent = ({ songs }) => {
                             <td>{song.title}</td>
                             <td>{song.artist}</td>
                             <td>{song.year}</td>
-                            <td>{song.genre}</td>
+                            <td>{genreNameMap[song.genre] || 'Unknown'}</td>
                             <td>{song.bpm}</td>
-                            <td>{song.key}</td>
+                            <td>{keynameMap[song.key] || 'Unknown'}</td>
                             <td>{song["Intro Chords"]}</td>
                             <td>{song["Intro Length"]}</td>
                             <td>{song["Intro Instrumentation"]}</td>
@@ -64,7 +79,7 @@ const SearchSongsComponent = ({ songs }) => {
                             <td>{song["Outro Length"]}</td>
                             <td>{song["Outro Instrumentation"]}</td>
                             <td>{song["Chart Pos"]}</td>
-                            <td>{song.location}</td>
+                            <td>{countryNameMap[song.location] || 'Unknown'}</td>
                             <td>{song.era}</td>
                             </tr>
                     ))}
@@ -75,3 +90,6 @@ const SearchSongsComponent = ({ songs }) => {
 }
 
 export default SearchSongsComponent;
+
+
+

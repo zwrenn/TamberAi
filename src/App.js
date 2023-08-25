@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import './App.css';
 import AdvancedSearchComponent from './components/AdvancedSearchComponent';
 import CreateComponent from './components/CreateComponent';
-import SongList from './components/SongList';
+import CSVUpload from './components/CSVUpload';  // Import the CSVUpload component
 import { Container, Navbar, Nav } from 'react-bootstrap';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
                             <Nav className="me-auto">
                                 <Nav.Link as={Link} to="/">Search</Nav.Link>
                                 <Nav.Link as={Link} to="/create">Create</Nav.Link>
-                                <Nav.Link as={Link} to="/songs">Songs</Nav.Link>
+                                <Nav.Link as={Link} to="/upload">Upload CSV</Nav.Link>  {/* New navigation link for uploading CSV */}
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
@@ -30,7 +30,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<AdvancedSearchComponent />} />
                         <Route path="/create" element={<CreateComponent />} />
-                        <Route path="/songs" element={<SongListPage />} />
+                        <Route path="/upload" element={<CSVUploadPage />} />  {/* New route for uploading CSV */}
                     </Routes>
                 </Container>
             </div>
@@ -38,11 +38,11 @@ function App() {
     );
 }
 
-function SongListPage() {
+function CSVUploadPage() {  // New component for the CSV upload page
     return (
         <div>
-            <h2>Songs Page</h2>
-            <SongList />
+            <h2>Upload Songs CSV</h2>
+            <CSVUpload />
         </div>
     );
 }

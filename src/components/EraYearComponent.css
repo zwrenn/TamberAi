@@ -1,7 +1,7 @@
 .mt-4 {
-    border-radius: 15px;
+    border-radius: 10px;
     box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    padding: 10px;
     background-color: #ffffff; /* You can adjust this color if needed */
-    margin-top: 20px; /* To ensure the container doesn't sit right at the top of its parent */
+    margin-top: 10px; /* To ensure the container doesn't sit right at the top of its parent */
 }
