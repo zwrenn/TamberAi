@@ -11,3 +11,15 @@ h2.display-4 {
     border-radius: 15px; /* Making the corners slightly more rounded */
   }
   
+  .spotify-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #222;
+    z-index: 1000;
+    padding: 10px;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+    /* Add more styling as needed */
+}

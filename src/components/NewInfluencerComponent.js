@@ -1,6 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Container, Row, Col, Button as BootstrapButton, Table } from 'react-bootstrap';
+import { 
+    Form, 
+    Container, 
+    Row, 
+    Col, 
+    Button as BootstrapButton, 
+    Table 
+} from 'react-bootstrap';
+import './NewInfluencerComponent.css';
+import axios from 'axios';
+import openai from 'openai';
+import ChatWidget from './ChatWidget';
 
+// Your OpenAI API key
+const apiKey = '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';
+openai.apiKey = apiKey;
+
+const formatLyrics = (lyrics) => {
+    // Split by Verse, Chorus, or Bridge
+    const parts = lyrics.split(/(Verse \d+|Chorus|Bridge)/).filter(Boolean);
+    
+    // Construct the formatted lyrics
+    let formattedLyrics = '';
+    for (let i = 0; i < parts.length; i += 2) {
+        const label = parts[i].trim();
+        const content = parts[i + 1] ? parts[i + 1].trim() : ''; 
+        formattedLyrics += `\n${label}: ${content}\n\n`;
+    }
+
+    return formattedLyrics.trim();
+};
+
+
+// NewlineText component
+function NewlineText({ text, onLineClick, highlightedLines }) {
+    const newText = text.split('\n').map((str, index) => {
+        const isTitle = /(Verse \d+|Chorus)/.test(str);
+        const isHighlighted = highlightedLines.hasOwnProperty(index);
+        return (
+            <p 
+                key={index} 
+                onClick={() => onLineClick(str, index)} 
+                className={isHighlighted ? 'highlighted' : ''}
+            >
+                {str.trim()}
+                {isTitle ? ': ' : ''}
+            </p>
+        );
+    });
+
+    return <>{newText}</>;
+}
+
+// Define highlightedLines state outside the component
+const initialHighlightedLines = {};
 
 const NewInfluencerComponent = () => {
     const [era, setEra] = useState('');
@@ -10,6 +63,7 @@ const NewInfluencerComponent = () => {
     const [location, setLocation] = useState('');
     const [genres, setGenres] = useState([]);
     const [selectedGenre, setSelectedGenre] = useState('');
+    const [selectedGenreName, setSelectedGenreName] = useState("");
     const [commonInstruments, setCommonInstruments] = useState([]);
     const [commonKeys, setCommonKeys] = useState([]);
     const [commonBPMs, setCommonBPMs] = useState([]);
@@ -28,28 +82,18 @@ const NewInfluencerComponent = () => {
     const [commonVerseChords, setCommonVerseChords] = useState([]);
     const [commonChorusChords, setCommonChorusChords] = useState([]);
     const [commonBridgeChords, setCommonBridgeChords] = useState([]);
+    const [translatedLyrics, setTranslatedLyrics] = useState("");
     const [commonOutroChords, setCommonOutroChords] = useState([]);
     const [isEraDisabled, setIsEraDisabled] = useState(false);
     const [isYearDisabled, setIsYearDisabled] = useState(false);
     const [selectedSong, setSelectedSong] = useState("None");
     const [influenceValue, setInfluenceValue] = useState(0);
+    const [generatedLyrics, setGeneratedLyrics] = useState('');
+    // Declare highlightedLines state
+    const [highlightedLines, setHighlightedLines] = useState(initialHighlightedLines);
+    // Define existingLyrics using highlightedLines
+    const existingLyrics = Object.values(highlightedLines).join('\n');
 
-
-    useEffect(() => {
-        const fetchAllSongs = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/songs');
-                const allSongs = await response.json();
-                console.log("Fetched all songs:", allSongs);  // This will show you the data
-                setSongs(allSongs);
-            } catch (error) {
-                console.error('Error fetching all songs:', error);
-            }
-        };
-    
-        fetchAllSongs();
-    }, []);
-    
     useEffect(() => {
         const fetchGenres = async () => {
             try {
@@ -62,6 +106,87 @@ const NewInfluencerComponent = () => {
         };
     
         fetchGenres();
+    }, []);
+    
+    const handleLineClick = (line, index) => {
+        if (highlightedLines.hasOwnProperty(index)) {
+            const newHighlights = { ...highlightedLines };
+            delete newHighlights[index];
+            setHighlightedLines(newHighlights);
+        } else {
+            setHighlightedLines({ ...highlightedLines, [index]: line });
+        }
+    };    
+    
+    async function handleGenerateLyrics() {
+        const separator = "\n---\n";  // Separator between highlighted and generated lyrics
+        const combinedLyrics = Object.values(highlightedLines).join('\n') + separator + generatedLyrics;
+        const prompt = `${combinedLyrics}\nGenerate lyrics in the style of a ${era} ${selectedGenreName} song. Be conceptual and artistic. Write these lyrics as if you were an incredible musician and lyricist. Pull inspiration from songs at the top of the charts during that time.`;
+    
+        try {
+            const payload = {
+                prompt: prompt,
+                highlightedLines: highlightedLines,
+                existingLyrics: combinedLyrics,
+                selectedGenreName: selectedGenreName,
+            };
+
+            const response = await axios.post('http://localhost:5001/generateLyrics', payload);
+
+            if (response.data && response.data.lyrics) {
+                const newLyrics = formatLyrics(response.data.lyrics);
+                setGeneratedLyrics(existingLyrics + "\n" + newLyrics);
+            } else {
+                console.error('Unexpected response data:', response.data);
+            }
+        } catch (error) {
+            console.error('Error generating lyrics:', error);
+            if (error.response && error.response.data) {
+                console.error('Server response:', error.response.data);
+            }
+        }
+    }
+    
+    // Example of error handling for fetch functions
+    const fetchData = async (url) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        // Use the fetchData function for error handling
+        const fetchAllSongs = async () => {
+            try {
+                const allSongs = await fetchData('http://localhost:5001/api/songs');
+                console.log("Fetched all songs:", allSongs);
+                setSongs(allSongs);
+            } catch (error) {
+                console.error('Error fetching all songs:', error);
+            }
+        };
+        fetchAllSongs();
+    }, []);
+    
+    useEffect(() => {
+        // Use the fetchData function for error handling
+        const fetchAllSongs = async () => {
+            try {
+                const allSongs = await fetchData('http://localhost:5001/api/songs');
+                console.log("Fetched all songs:", allSongs);
+                setSongs(allSongs);
+            } catch (error) {
+                console.error('Error fetching all songs:', error);
+            }
+        };
+        fetchAllSongs();
     }, []);
     
     useEffect(() => {
@@ -79,6 +204,15 @@ const NewInfluencerComponent = () => {
         fetchCountries();
     }, []);
 
+    const runAppleScript = async () => {
+        try {
+            const response = await axios.get('http://localhost:5001/run-script');
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error running script:", error);
+        }
+    };
+    
     const updateYear = async (selectedYear) => {
         console.log("Updating year...");
         try {
@@ -100,14 +234,35 @@ const NewInfluencerComponent = () => {
     const handleEraChange = (e) => {
         const selectedEra = e.target.value;
         setEra(selectedEra);
-        if (selectedEra === "") { // If the user selects the default "Select an era" option
-            setIsYearDisabled(false); // Enable year slider
-        } else {
+        if (selectedEra) { // If an era is selected
             setIsYearDisabled(true); // Disable year slider
+        } else {
+            setIsYearDisabled(false); // Enable year slider
             setIsEraDisabled(false); // Ensure era dropdown is enabled
         }
     };
+
+    const handleGenreChange = (e) => {
+        const genreId = e.target.value;
+        setSelectedGenre(genreId);
+        
+        const selected = genres.find(genre => genre.genre_id === parseInt(genreId, 10));
+        if (selected) {
+        setSelectedGenreName(selected.genre_name);
+        } else {
+        setSelectedGenreName(""); // Reset if no genre is selected
+        }
+    };
     
+     const handleTranslateClick = async () => {
+        // Trigger the translation here
+        // You could use a translation API or another GPT-3 model
+        // const englishLyrics = await translateToEnglish(generatedLyrics);
+        
+        // Update the state with the translated lyrics
+        // setTranslatedLyrics(englishLyrics);
+     };
+
     const fetchCommonData = async () => {
         console.log("era:", era);
         console.log("selectedGenre:", selectedGenre);
@@ -116,7 +271,7 @@ const NewInfluencerComponent = () => {
         console.log("influenceValue:", influenceValue);
         
         try {
-            let apiUrl = `http://localhost:5001/api/popular-instruments?`;
+            let apiUrl = 'http://localhost:5001/api/popular-instruments?';
         
             if (era) {
                 apiUrl += `era=${era}&`;
@@ -175,15 +330,14 @@ const NewInfluencerComponent = () => {
         }
     };
     
-    
     console.log("Songs Data:", songs);
 
     return (
         <Container className="mt-4 influencer-component">
             <h2 className="mb-4">Influence Search</h2>
 
-            <Row className="mb-3 justify-content-center">
-                <Col md={3}>
+            <Row className="mb-3">
+                <Col md={4}>
                     <Form.Group controlId="era">
                         <Form.Label>Era:</Form.Label>
                         <Form.Control as="select" value={era} onChange={handleEraChange} disabled={isEraDisabled}>
@@ -197,10 +351,9 @@ const NewInfluencerComponent = () => {
                             <option value="2010s">2010s</option>
                             <option value="2020s">2020s</option>
                         </Form.Control>
-                    </Form.Group>
+                        </Form.Group>
                 </Col>
-
-                <Col md={3}>
+                <Col md={4}>
                     <Form.Group controlId="year">
                         <Form.Label>Year: {year}</Form.Label>
                         <Form.Control 
@@ -217,18 +370,23 @@ const NewInfluencerComponent = () => {
                         />
                     </Form.Group>
                 </Col>
-                <Col md={3}>
+                <Col md={4}>
                     <Form.Group controlId="genre">
-                        <Form.Label>Genre:</Form.Label>
-                        <Form.Control as="select" value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
-                            <option value="">Select a Genre</option>
-                            {genres.map(genre => (
-                                <option key={genre.genre_id} value={genre.genre_id}>
-                                    {genre.genre_name}
-                                </option>
-                            ))}
+                    <Form.Label>Genre:</Form.Label>
+                    <Form.Control as="select" value={selectedGenre} onChange={handleGenreChange}>
+                        <option value="">Select a Genre</option>
+                        {genres.map(genre => (
+                            <option key={genre.genre_id} value={genre.genre_id}>
+                            {genre.genre_name}
+                            </option>
+                        ))}
                         </Form.Control>
-                    </Form.Group>
+                        </Form.Group>
+                    {selectedGenreName === 'Chanson' && (
+                    <button onClick={handleTranslateClick}>
+                        Translate to English
+                    </button>
+                    )}
                 </Col>
             </Row>
 
@@ -237,7 +395,7 @@ const NewInfluencerComponent = () => {
                     <Form.Group controlId="location">
                         <Form.Label>Location:</Form.Label>
                         <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
-                            <option value="">--Select a Country</option>
+                            <option value="">Select a Location</option>
                             {countries.map(country => (
                                 <option key={country.country_id} value={country.country_id}>
                                     {country.countryname}
@@ -276,6 +434,12 @@ const NewInfluencerComponent = () => {
             <Row className="mb-4 justify-content-center">
                 <Col md={4} className="text-center">
                     <BootstrapButton onClick={fetchCommonData} size="lg" className="btn-search">Search Common Data</BootstrapButton>
+                </Col>
+                <Col md={4} className="text-center">
+                    <BootstrapButton onClick={handleGenerateLyrics} size="lg" className="btn-search">Generate Lyrics</BootstrapButton>
+                </Col>
+                <Col md={4} className="text-center">
+                    <BootstrapButton onClick={runAppleScript} size="lg" className="btn-search">Export Structure</BootstrapButton>
                 </Col>
             </Row>
 
@@ -401,10 +565,24 @@ const NewInfluencerComponent = () => {
                 </tbody>
             </Table>
             </div>
-        </Container>
+        {/* Begin Generated Lyrics Sub-container */}
+        <Container className="generated-lyrics-container mb-4">
+            <Row className="justify-content-center">
+            <Col md={4} className="text-center">
+                <h2>Generated Lyrics:</h2>
+                <NewlineText 
+                    text={translatedLyrics || generatedLyrics} // Display translated lyrics if available
+                    onLineClick={handleLineClick}
+                    highlightedLines={highlightedLines}
+                />
+            </Col>
+            </Row>
+</Container>
+
+        {/* End Generated Lyrics Sub-container */}
+
+</Container>
     );
 }
 
 export default NewInfluencerComponent;
-
-

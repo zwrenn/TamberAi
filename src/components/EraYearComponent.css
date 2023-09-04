@@ -1,6 +1,9 @@
+/* EraYearComponent.css */
+
 body {
   background-color: #1a1a1a;
   color: #eee;
+  font-family: Arial, sans-serif;
 }
 
 .container {
@@ -14,6 +17,7 @@ h2 {
   border-bottom: 2px solid #555;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  font-size: 24px;
 }
 
 .form-label {
@@ -21,14 +25,28 @@ h2 {
   font-weight: bold;
 }
 
-.form-control {
+.form-control, select, [type="number"], [type="text"] {
+  padding: 0.5rem 1rem;
+  position: relative;
   background-color: #3b3b3b;
   color: #ddd;
   border: none;
   border-radius: 5px;
 }
 
-.form-control:focus {
+.form-control::before, select::before, [type="number"]::before, [type="text"]::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  background: linear-gradient(45deg, transparent 40%, #000 40%);
+  z-index: -1;
+  border-radius: 10px;
+}
+
+.form-control:focus, select:focus, [type="number"]:focus, [type="text"]:focus {
   background-color: #4d4d4d;
   color: #eee;
   border: none;
@@ -36,8 +54,8 @@ h2 {
 }
 
 .custom-btn {
-  background-color: #61dafb;
-  border-color: #61dafb;
+  background-color: #696969;
+  border-color: #646464;
   color: #1a1a1a;
   border-radius: 8px;
   padding: 12px 20px;
@@ -47,8 +65,8 @@ h2 {
 }
 
 .custom-btn:hover {
-  background-color: #00a9e0;
-  border-color: #00a9e0;
+  background-color: #929292;
+  border-color: #969696;
   transform: scale(1.05);
 }
 
@@ -56,10 +74,36 @@ h2 {
 .react-select__control {
   background-color: #3b3b3b;
   border: none;
+  position: relative;
+}
+
+.react-select__control::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  background: linear-gradient(45deg, transparent 40%, #000 40%);
+  z-index: -1;
+  border-radius: 10px;
 }
 
 .react-select__menu {
   background-color: #282c34;
+  position: relative;
+}
+
+.react-select__menu::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  right: -16px;
+  bottom: -16px;
+  background: linear-gradient(45deg, transparent 40%, #000 40%);
+  z-index: -1;
+  border-radius: 10px;
 }
 
 .react-select__option {
@@ -71,6 +115,6 @@ h2 {
 }
 
 .react-select__option--is-selected {
-  background-color: #61dafb;
+  background-color: #949494;
   color: #1a1a1a;
 }

@@ -49,8 +49,12 @@ const darkThemeStyles = {
     })
 };
 
-
-const EraYearComponent = () => {
+const EraYearComponent = (props) => {
+    // This function is triggered when a song is clicked.
+    const onSongClick = (uri) => {
+        console.log("Song URI received in EraYearComponent:", uri);
+        props.onTrackSelect(uri); // Notify the parent
+    };    
     const [era, setEra] = useState('');
     const [year, setYear] = useState(1958); // Setting default year as 1958
     const [songs, setSongs] = useState([]); // State to store fetched songs
@@ -72,6 +76,7 @@ const EraYearComponent = () => {
     const [camelot, setCamelot] = useState([]);
     const [selectedCamelotId, setSelectedCamelotId] = useState('');
 
+    
 
    // Initialize the filtered songs state with all songs
     const [filteredSongs, setFilteredSongs] = useState(songs);
@@ -240,7 +245,7 @@ const EraYearComponent = () => {
                     <Form.Group controlId="era">
                         <Form.Label>Era:</Form.Label>
                         <Form.Control as="select" value={era} onChange={handleEraChange}>
-                            <option value="">--Select an era--</option>
+                            <option value="">Select an Era</option>
                             <option value="1950s">1950s</option>
                             <option value="1960s">1960s</option>
                             <option value="1970s">1970s</option>
@@ -265,7 +270,7 @@ const EraYearComponent = () => {
                                 setSelectedKey({ value: selectedKeyName, id: selectedKeyId });
                             }}
                         >
-                            <option value="">--Select a Key--</option>
+                            <option value="">Select a Key</option>
                             {keys.map(key => (
                                 <option key={key.keysignatureid} value={key.keyname}>
                                     {key.keyname}
@@ -279,7 +284,7 @@ const EraYearComponent = () => {
                     <Form.Group controlId="location">
                         <Form.Label>Location:</Form.Label>
                         <Form.Control as="select" value={location} onChange={e => setLocation(e.target.value)}>
-                            <option value="">--Select a Country--</option>
+                            <option value="">Select a Location</option>
                             {countries.map(country => (
                                 <option key={country.country_id} value={country.country_id}>
                                     {country.countryname}
@@ -320,7 +325,7 @@ const EraYearComponent = () => {
                     <Form.Group controlId="genre">
                         <Form.Label>Genre:</Form.Label>
                         <Form.Control as="select" value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
-                            <option value="">--Select a Genre--</option>
+                            <option value="">Select a Genre</option>
                             {genres.map(genre => (
                                 <option key={genre.genre_id} value={genre.genre_id}>
                                     {genre.genre_name}
@@ -346,7 +351,7 @@ const EraYearComponent = () => {
                                 setSelectedCamelotId({ value: selectedCamelotName, id: selectedCamelotId });
                             }}
                         >
-                            <option value="">--Select a Camelot--</option>
+                            <option value="">Select a Camelot</option>
                             {camelot.map(camelotItem => (
                                 <option camelot={camelotItem.camelot_id} value={camelotItem.camelot_name}>
                                     {camelotItem.camelot_name}
@@ -406,9 +411,7 @@ const EraYearComponent = () => {
                     />
                 </Col>
             </Row>
-    
-            <SearchSongsComponent songs={filteredSongs} keysignatures={keys} genres={genres} countries={countries} camelot={camelot} />
-    
+            <SearchSongsComponent onSongClick={onSongClick} songs={filteredSongs} keysignatures={keys} genres={genres} countries={countries} camelot={camelot} />
         </Container>
     );
 }

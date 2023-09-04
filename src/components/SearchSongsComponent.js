@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot }) => {
+const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot, onSongClick }) => {
     const keynameMap = {};
     keysignatures.forEach(keysignature => {
         keynameMap[keysignature.keysignatureid] = keysignature.keyname;
@@ -22,8 +22,9 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot
         camelotNameMap[camelot.camelot_id] = camelot.camelot_name;
     });
 
+
     return (
-         <div className="song-table">
+        <div className="song-table">
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
@@ -55,12 +56,22 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot
                         <th>Chart Position</th>
                         <th>Country</th>
                         <th>Era</th>
-                        </tr>
+                    </tr>
                 </thead>
                 <tbody>
                     {songs.map(song => (
                         <tr key={song.id}>
-                            <td><a href={song['Spotify URL']} target="_blank" rel="noopener noreferrer">{song.title}</a></td>
+                            <td>
+                                {/* This will trigger the song change in the player when clicked */}
+                                <a href={song['Spotify URL']} onClick={(e) => {
+                                    e.preventDefault();
+                                    console.log("Direct click log for:", song.title);
+                                    onSongClick(song['Spotify URL']);
+                                    console.log("Complete song object:", song);
+                                }}>
+                                    {song.title}
+                                </a>
+                            </td>
                             <td>{song.artist}</td>
                             <td>{song.year}</td>
                             <td>{genreNameMap[song.genre] || 'Unknown'}</td>
@@ -88,7 +99,7 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot
                             <td>{song["Chart Pos"]}</td>
                             <td>{countryNameMap[song.location] || 'Unknown'}</td>
                             <td>{song.era}</td>
-                            </tr>
+                        </tr>
                     ))}
                 </tbody>
             </Table>
@@ -97,6 +108,3 @@ const SearchSongsComponent = ({ songs, keysignatures, genres, countries, camelot
 }
 
 export default SearchSongsComponent;
-
-
-

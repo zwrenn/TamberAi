@@ -25,11 +25,18 @@ const ChatWidget = () => {
         query: input,
       });
 
-      // Add GPT-3 response to the conversation
-      setMessages([...messages, { text: response.data.response, sender: 'bot' }]);
+      // Split the response into individual messages
+      const responseMessages = response.data.response.split('\n').filter(line => line.trim() !== '');
+    
+      // Add GPT-3 response messages to the conversation
+      const newMessages = [
+        ...messages,
+        ...responseMessages.map(text => ({ text, sender: 'bot' })),
+      ];
+      setMessages(newMessages);
     } catch (error) {
       console.error('Error fetching response:', error);
-    }
+    }    
     
     setInput('');
   };
