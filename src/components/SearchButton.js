@@ -4,6 +4,8 @@ import { Button } from 'react-bootstrap';
 const SearchButton = ({
     searchText,
     era,
+    year,
+    showEra,
     chartPos,
     location,
     selectedKey,
@@ -22,10 +24,16 @@ const SearchButton = ({
         if (searchText) {
             url += `search=${searchText}&`;
         }
-    
-        if (era) {
+
+        console.log("Debug: Entering handleSearch");
+
+        if (showEra && era) {
+            console.log("Debug: Adding era");
             url += `era=${era}&`;
-        }
+        } else if (!showEra && year) {
+            console.log("Debug: Adding year");
+            url += `year=${year}&`;
+        } 
     
         if (chartPos) {
             url += `chartPos=${chartPos}&`;

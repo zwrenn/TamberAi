@@ -4,8 +4,16 @@ import EraYearComponent from './EraYearComponent';
 import './AdvancedSearchComponent.css';
 import SpotifyPlayer from './SpotifyPlayer';
 
+const convertUrlToURI = (url) => {
+    return url ? url.replace('https://open.spotify.com/track/', 'spotify:track:') : null;
+};
+
 const AdvancedSearchComponent = () => {
     const [currentTrackUri, setCurrentTrackUri] = React.useState(null); 
+
+    const handleTrackSelect = (url) => {
+        setCurrentTrackUri(convertUrlToURI(url));
+    }
 
     return (
         <>
@@ -15,7 +23,7 @@ const AdvancedSearchComponent = () => {
                         <div className="text-center mb-5">
                         </div>
                         <div className="rounded p-5 shadow">
-                            <EraYearComponent onTrackSelect={setCurrentTrackUri} />
+                        <EraYearComponent onTrackSelect={handleTrackSelect} />
                         </div>
                     </Col>
                 </Row>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
     Form, 
     Container, 
@@ -10,7 +10,7 @@ import {
 import './NewInfluencerComponent.css';
 import axios from 'axios';
 import openai from 'openai';
-import ChatWidget from './ChatWidget';
+import { addVoiceCommand } from './VoiceCommandManager';
 
 // Your OpenAI API key
 const apiKey = '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';
@@ -30,7 +30,6 @@ const formatLyrics = (lyrics) => {
 
     return formattedLyrics.trim();
 };
-
 
 // NewlineText component
 function NewlineText({ text, onLineClick, highlightedLines }) {
@@ -85,185 +84,41 @@ const NewInfluencerComponent = () => {
     const [translatedLyrics, setTranslatedLyrics] = useState("");
     const [commonOutroChords, setCommonOutroChords] = useState([]);
     const [isEraDisabled, setIsEraDisabled] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isYearFunctionEnabled, setIsYearFunctionEnabled] = useState(true);
+    const [loadingPercentage, setLoadingPercentage] = useState(0);
     const [isYearDisabled, setIsYearDisabled] = useState(false);
+    const [abstractionLevel, setAbstractionLevel] = useState(0);
+    const handleAbstractionChange = (event) => {
+        setAbstractionLevel(event.target.value);
+    };    
     const [selectedSong, setSelectedSong] = useState("None");
     const [influenceValue, setInfluenceValue] = useState(0);
+    const [selectedArtist, setSelectedArtist] = useState("");
+    const handleArtistChange = (event) => {
+        setSelectedArtist(event.target.value);
+    };    
     const [generatedLyrics, setGeneratedLyrics] = useState('');
     // Declare highlightedLines state
     const [highlightedLines, setHighlightedLines] = useState(initialHighlightedLines);
     // Define existingLyrics using highlightedLines
     const existingLyrics = Object.values(highlightedLines).join('\n');
+    const availableEras = ['1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 
-    useEffect(() => {
-        const fetchGenres = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/genres');
-                const data = await response.json();
-                setGenres(data);
-            } catch (error) {
-                console.error("Error fetching genres:", error);
-            }
-        };
+    addVoiceCommand('set era to', (voiceParams) => {
+        const lowerCaseVoiceParams = voiceParams.toLowerCase();
+      
+        // Find the first era that matches the voiceParams
+        const matchedEra = availableEras.find(era => lowerCaseVoiceParams.includes(era.toLowerCase()));
     
-        fetchGenres();
-    }, []);
-    
-    const handleLineClick = (line, index) => {
-        if (highlightedLines.hasOwnProperty(index)) {
-            const newHighlights = { ...highlightedLines };
-            delete newHighlights[index];
-            setHighlightedLines(newHighlights);
+        if (matchedEra) {
+            setEra(matchedEra);
         } else {
-            setHighlightedLines({ ...highlightedLines, [index]: line });
+            console.log(`Could not match "${voiceParams}" to an available era.`);
         }
-    };    
+    });
     
-    async function handleGenerateLyrics() {
-        const separator = "\n---\n";  // Separator between highlighted and generated lyrics
-        const combinedLyrics = Object.values(highlightedLines).join('\n') + separator + generatedLyrics;
-        const prompt = `${combinedLyrics}\nGenerate lyrics in the style of a ${era} ${selectedGenreName} song. Be conceptual and artistic. Write these lyrics as if you were an incredible musician and lyricist. Pull inspiration from songs at the top of the charts during that time.`;
-    
-        try {
-            const payload = {
-                prompt: prompt,
-                highlightedLines: highlightedLines,
-                existingLyrics: combinedLyrics,
-                selectedGenreName: selectedGenreName,
-            };
-
-            const response = await axios.post('http://localhost:5001/generateLyrics', payload);
-
-            if (response.data && response.data.lyrics) {
-                const newLyrics = formatLyrics(response.data.lyrics);
-                setGeneratedLyrics(existingLyrics + "\n" + newLyrics);
-            } else {
-                console.error('Unexpected response data:', response.data);
-            }
-        } catch (error) {
-            console.error('Error generating lyrics:', error);
-            if (error.response && error.response.data) {
-                console.error('Server response:', error.response.data);
-            }
-        }
-    }
-    
-    // Example of error handling for fetch functions
-    const fetchData = async (url) => {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return await response.json();
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            throw error;
-        }
-    };
-
-    useEffect(() => {
-        // Use the fetchData function for error handling
-        const fetchAllSongs = async () => {
-            try {
-                const allSongs = await fetchData('http://localhost:5001/api/songs');
-                console.log("Fetched all songs:", allSongs);
-                setSongs(allSongs);
-            } catch (error) {
-                console.error('Error fetching all songs:', error);
-            }
-        };
-        fetchAllSongs();
-    }, []);
-    
-    useEffect(() => {
-        // Use the fetchData function for error handling
-        const fetchAllSongs = async () => {
-            try {
-                const allSongs = await fetchData('http://localhost:5001/api/songs');
-                console.log("Fetched all songs:", allSongs);
-                setSongs(allSongs);
-            } catch (error) {
-                console.error('Error fetching all songs:', error);
-            }
-        };
-        fetchAllSongs();
-    }, []);
-    
-    useEffect(() => {
-        const fetchCountries = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/countries');
-                const data = await response.json();
-                console.log("Fetched countries:", data);  // Log the fetched data
-                setCountries(data);
-            } catch (error) {
-                console.error("Error fetching countries:", error);
-            }
-        };
-    
-        fetchCountries();
-    }, []);
-
-    const runAppleScript = async () => {
-        try {
-            const response = await axios.get('http://localhost:5001/run-script');
-            console.log(response.data);
-        } catch (error) {
-            console.error("Error running script:", error);
-        }
-    };
-    
-    const updateYear = async (selectedYear) => {
-        console.log("Updating year...");
-        try {
-            const response = await fetch('http://localhost:5001/api/updateYear', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ year: selectedYear })
-            });
-    
-            const songsByYear = await response.json();
-            setSongs(songsByYear);  // Assuming you have a state variable to store the songs
-        } catch (error) {
-            console.error('Error updating year:', error);
-        }
-    };
-
-    const handleEraChange = (e) => {
-        const selectedEra = e.target.value;
-        setEra(selectedEra);
-        if (selectedEra) { // If an era is selected
-            setIsYearDisabled(true); // Disable year slider
-        } else {
-            setIsYearDisabled(false); // Enable year slider
-            setIsEraDisabled(false); // Ensure era dropdown is enabled
-        }
-    };
-
-    const handleGenreChange = (e) => {
-        const genreId = e.target.value;
-        setSelectedGenre(genreId);
-        
-        const selected = genres.find(genre => genre.genre_id === parseInt(genreId, 10));
-        if (selected) {
-        setSelectedGenreName(selected.genre_name);
-        } else {
-        setSelectedGenreName(""); // Reset if no genre is selected
-        }
-    };
-    
-     const handleTranslateClick = async () => {
-        // Trigger the translation here
-        // You could use a translation API or another GPT-3 model
-        // const englishLyrics = await translateToEnglish(generatedLyrics);
-        
-        // Update the state with the translated lyrics
-        // setTranslatedLyrics(englishLyrics);
-     };
-
-    const fetchCommonData = async () => {
+    const fetchCommonData = useCallback(async () => {
         console.log("era:", era);
         console.log("selectedGenre:", selectedGenre);
         console.log("location:", location);
@@ -280,6 +135,10 @@ const NewInfluencerComponent = () => {
             if (selectedGenre) {
                 apiUrl += `genre=${selectedGenre}&`;
             }
+
+            if (year) {
+                apiUrl += `year=${year}&`;
+            }            
         
             if (location) {
                 apiUrl += `location=${location}&`;
@@ -328,8 +187,238 @@ const NewInfluencerComponent = () => {
         } catch (error) {
             console.error("Error fetching data:", error);
         }
+    }, [era, selectedGenre, location, selectedSong, influenceValue, year]);
+
+    useEffect(() => {
+        const fetchGenres = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/api/genres');
+                const data = await response.json();
+                setGenres(data);
+            } catch (error) {
+                console.error("Error fetching genres:", error);
+            }
+        };
+    
+        fetchGenres();
+    }, []);
+    
+    const handleLineClick = (line, index) => {
+        if (highlightedLines.hasOwnProperty(index)) {
+            const newHighlights = { ...highlightedLines };
+            delete newHighlights[index];
+            setHighlightedLines(newHighlights);
+        } else {
+            setHighlightedLines({ ...highlightedLines, [index]: line });
+        }
+    };    
+    
+    const handleGenerateLyrics = useCallback(async () => {
+        setLoading(true);  // Start the loading process
+        setLoadingPercentage(0);  // Reset percentage
+        const separator = "\n---\n";  // Separator between highlighted and generated lyrics
+        const combinedLyrics = Object.values(highlightedLines).join('\n') + separator + generatedLyrics;
+        
+        let prompt = `${combinedLyrics}\nGenerate lyrics in the style of a ${era} ${selectedGenreName} song. Be conceptual and artistic. Write these lyrics as if you were an incredible musician and lyricist. Pull inspiration from songs at the top of the charts during that time. If songs in this genre are normally in another language, feel free to create lyrics in that language.`;
+
+        // Add artist influence to the prompt if specified
+        if (selectedArtist) {
+            prompt += ` Write these lyrics as if ${selectedArtist} composed it.`;
+        }
+
+            // Add abstraction cues
+        if (abstractionLevel > 2) {
+            prompt += ` Make the lyrics more abstract and conceptual.`;
+        }
+        if (abstractionLevel > 4) {
+            prompt += ` Add a philosophical touch.`;
+        }
+
+        // If the genre is "Chanson", modify the prompt to request lyrics in French.
+        if (selectedGenreName === 'Chanson') {
+            prompt += " Générer les paroles dans le style d'une chanson française.";
+        }
+
+        // If the genre is "Schlager", modify the prompt to request lyrics in German.
+        if (selectedGenreName === 'Schlager') {
+            prompt += " Texte im Stil eines deutschen Schlagers generieren.";
+        }
+    
+        try {
+            const payload = {
+                prompt: prompt,
+                highlightedLines: highlightedLines,
+                existingLyrics: combinedLyrics,
+                selectedGenreName: selectedGenreName,
+                abstractionLevel: abstractionLevel,
+            };
+    
+            const response = await axios.post('http://localhost:5001/generateLyrics', payload);
+    
+            if (response.data && response.data.lyrics) {
+                const newLyrics = formatLyrics(response.data.lyrics);
+                setGeneratedLyrics(existingLyrics + "\n" + newLyrics);
+            } else {
+                console.error('Unexpected response data:', response.data);
+            }
+        } catch (error) {
+            console.error('Error generating lyrics:', error);
+            if (error.response && error.response.data) {
+                console.error('Server response:', error.response.data);
+            }
+        } finally {  // New finally block
+            setLoading(false);  // End the loading process
+            setLoadingPercentage(100);  // Set to 100% to indicate completion
+        }
+    }, [highlightedLines, generatedLyrics, era, selectedGenreName, selectedArtist, abstractionLevel, existingLyrics]);
+
+    // Example of error handling for fetch functions
+    const fetchData = async (url) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            throw error;
+        }
+    };   
+
+    const handleEraChange = (e) => {
+        const selectedEra = e.target.value;
+        setEra(selectedEra);
+        if (selectedEra) { // If an era is selected
+            setIsYearDisabled(true); // Disable year slider
+        } else {
+            setIsYearDisabled(false); // Enable year slider
+            setIsEraDisabled(false); // Ensure era dropdown is enabled
+        }
+    };
+
+    const handleGenreChange = (e) => {
+        const genreId = e.target.value;
+        setSelectedGenre(genreId);
+        
+        const selected = genres.find(genre => genre.genre_id === parseInt(genreId, 10));
+        if (selected) {
+        setSelectedGenreName(selected.genre_name);
+        } else {
+        setSelectedGenreName(""); // Reset if no genre is selected
+        }
     };
     
+     const handleTranslateClick = async () => {
+        // Trigger the translation here
+        // You could use a translation API or another GPT-3 model
+        // const englishLyrics = await translateToEnglish(generatedLyrics);
+        
+        // Update the state with the translated lyrics
+        // setTranslatedLyrics(englishLyrics);
+     };
+    
+     const runAppleScript = useCallback(async () => {
+        try {
+            const response = await axios.get('http://localhost:5001/run-script');
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error running script:", error);
+        }
+    }, []); // The empty array means this callback never re-creates unless component re-mounts.    
+    
+    useEffect(() => {
+        // Use the fetchData function for error handling
+        const fetchAllSongs = async () => {
+            try {
+                const allSongs = await fetchData('http://localhost:5001/api/songs');
+                console.log("Fetched all songs:", allSongs);
+                setSongs(allSongs);
+            } catch (error) {
+                console.error('Error fetching all songs:', error);
+            }
+        };
+        fetchAllSongs();
+    }, []);
+    
+    useEffect(() => {
+        // Use the fetchData function for error handling
+        const fetchAllSongs = async () => {
+            try {
+                const allSongs = await fetchData('http://localhost:5001/api/songs');
+                console.log("Fetched all songs:", allSongs);
+                setSongs(allSongs);
+            } catch (error) {
+                console.error('Error fetching all songs:', error);
+            }
+        };
+        fetchAllSongs();
+    }, []);
+    
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/api/countries');
+                const data = await response.json();
+                console.log("Fetched countries:", data);  // Log the fetched data
+                setCountries(data);
+            } catch (error) {
+                console.error("Error fetching countries:", error);
+            }
+        };
+    
+        fetchCountries();
+    }, []);
+
+    useEffect(() => {
+        addVoiceCommand("set location to :location", (params) => {
+            const { location } = params;
+            const validCountry = countries.find(c => c.countryname.toLowerCase() === location.toLowerCase());
+            
+            if (validCountry) {
+                setLocation(validCountry.countryname);
+            } else {
+                // Handle the case where the location is not valid.
+                // Maybe set a state that triggers a UI element to show "Invalid location"
+            }
+        });
+    }, [countries]); // Adding countries as a dependency ensures that this useEffect re-runs whenever countries changes.    
+    
+    useEffect(() => {
+        // Simulate percentage increase while loading
+        if (loading && loadingPercentage < 90) {
+            const interval = setInterval(() => {
+                setLoadingPercentage((prev) => Math.min(prev + 10, 90));
+            }, 500);  // Increase every 0.5 seconds
+    
+            return () => clearInterval(interval);  // Cleanup interval on unmount or completion
+        }
+    }, [loading, loadingPercentage]);
+    
+    useEffect(() => {
+        addVoiceCommand('common data', fetchCommonData);
+        addVoiceCommand('generate lyrics', handleGenerateLyrics);
+        addVoiceCommand('open logic', runAppleScript);
+    }, [fetchCommonData, handleGenerateLyrics, runAppleScript]);        
+
+    useEffect(() => {
+        // Define the event listener logic
+        const handleKeyPress = (e) => {
+            if (e.keyCode === 32) { // Spacebar key
+                // Your logic here
+                console.log("Spacebar pressed");
+            }
+        };
+      
+        // Attach the event listener
+        window.addEventListener('keydown', handleKeyPress);
+      
+        // Cleanup
+        return () => {
+            window.removeEventListener('keydown', handleKeyPress);
+        };
+    }, []);  // Empty dependency array means this useEffect runs once when the component mounts
+
     console.log("Songs Data:", songs);
 
     return (
@@ -354,6 +443,15 @@ const NewInfluencerComponent = () => {
                         </Form.Group>
                 </Col>
                 <Col md={4}>
+                    <Form.Group controlId="yearCheckbox">
+                        <Form.Check 
+                            type="checkbox" 
+                            label="Enable Year Function" 
+                            checked={isYearFunctionEnabled}
+                            onChange={e => setIsYearFunctionEnabled(e.target.checked)}
+                        />
+                    </Form.Group>
+
                     <Form.Group controlId="year">
                         <Form.Label>Year: {year}</Form.Label>
                         <Form.Control 
@@ -361,7 +459,7 @@ const NewInfluencerComponent = () => {
                             min="1958" 
                             max="2023" 
                             value={year}
-                            disabled={isYearDisabled}
+                            disabled={!isYearFunctionEnabled}
                             onChange={e => {
                                 const selectedYear = e.target.value;
                                 setYear(selectedYear);
@@ -403,6 +501,18 @@ const NewInfluencerComponent = () => {
                             ))}
                         </Form.Control>
                     </Form.Group>
+                </Col>
+                <Col md={3}>
+                <Form.Group controlId="artist">
+                    <Form.Label>Artist Influence:</Form.Label>
+                    <Form.Control type="text" placeholder="Enter artist name" value={selectedArtist} onChange={handleArtistChange} />
+                </Form.Group>
+                </Col>
+                <Col md={3}>
+                <Form.Group controlId="abstractionLevel">
+                    <Form.Label>Abstraction Level:</Form.Label>
+                    <Form.Control type="range" min="0" max="5" step="1" value={abstractionLevel} onChange={handleAbstractionChange} />
+                </Form.Group>
                 </Col>
                 <Col md={3}>
                     <Form.Group controlId="song">
@@ -565,23 +675,29 @@ const NewInfluencerComponent = () => {
                 </tbody>
             </Table>
             </div>
-        {/* Begin Generated Lyrics Sub-container */}
-        <Container className="generated-lyrics-container mb-4">
-            <Row className="justify-content-center">
+    {/* Begin Generated Lyrics Sub-container */}
+    <Container className="generated-lyrics-container mb-4">
+        <Row className="justify-content-center">
             <Col md={4} className="text-center">
                 <h2>Generated Lyrics:</h2>
+                    {/* Loader */}
+                    {loading && (
+                    <div className="loader-container">
+                        <div className="loader"></div>
+                        <p>{loadingPercentage}%</p>
+                    </div>
+                    )}
                 <NewlineText 
                     text={translatedLyrics || generatedLyrics} // Display translated lyrics if available
                     onLineClick={handleLineClick}
                     highlightedLines={highlightedLines}
                 />
             </Col>
-            </Row>
+        </Row>
+    </Container>
+    {/* End Generated Lyrics Sub-container */}
 </Container>
 
-        {/* End Generated Lyrics Sub-container */}
-
-</Container>
     );
 }
 

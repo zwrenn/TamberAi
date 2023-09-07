@@ -2,7 +2,52 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 60px;
-    background-color: #1DB954; /* Spotify green */
-    /* ... any other styles you want */
+    background-color: #282828;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 3%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.track-info {
+    display: flex;
+    align-items: center;
+}
+
+.album-cover {
+    width: 70px;
+    height: 70px;
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.track-details .track-title, .track-details .track-artist {
+    color: #fff;
+    font-size: 15px;
+    width: 120px;
+    margin: 0;
+}
+
+.controls button {
+    background-color: transparent;
+    border: none;
+    color: #1ED760;
+    font-size: 20px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.auth-controls .spotify-login {
+    color: #1ED760;
+    text-decoration: none;
+    border: 1px solid #1ED760;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.auth-controls .spotify-login:hover {
+    background-color: #1ED760;
+    color: #fff;
 }

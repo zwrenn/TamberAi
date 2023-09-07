@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Container, Row, Col, Table } from 'react-bootstrap';
+import { Form, Container, Row, Col, Button } from 'react-bootstrap';
 import SearchButton from './SearchButton';
 import ChartPositionComponent from './ChartPositionComponent';
 import Select from 'react-select';
@@ -68,16 +68,31 @@ const EraYearComponent = (props) => {
     const [bpm, setBpm] = useState('');
     const [instruments, setInstruments] = useState([]);
     const [selectedInstruments, setSelectedInstruments] = useState([]);
-    const [chords, setChords] = useState([]); // New state for selected chords
     const [selectedChords, setSelectedChords] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [commonInstruments, setCommonInstruments] = useState([]);
-    const [popularParams, setPopularParams] = useState({});
     const [camelot, setCamelot] = useState([]);
     const [selectedCamelotId, setSelectedCamelotId] = useState('');
+    const [showEra, setShowEra] = useState(true);
 
+    const handleEraChange = (e) => {
+        const selectedEra = e.target.value;
+        setEra(selectedEra);
+        setYear(null); // Clear the year when an era is selected
+    };
     
-
+    const handleYearChange = (e) => {
+        const selectedYear = parseInt(e.target.value);
+        setYear(selectedYear);
+        setEra(null); // Clear the era when a year is selected
+    };         
+    
+    const handleEraYearToggle = () => {
+        setShowEra(!showEra);
+        // Clear both era and year when toggling to avoid conflicts
+        setEra(null);
+        setYear(null);
+    };  
+    
    // Initialize the filtered songs state with all songs
     const [filteredSongs, setFilteredSongs] = useState(songs);
 
@@ -92,67 +107,30 @@ const EraYearComponent = (props) => {
         console.log("Filtered songs:", filtered); // Add this line
         setFilteredSongs(filtered);
     }, [songs, searchText]);
-    
-    
-    const fetchPopularParams = async () => {
-        try {
-            const response = await fetch(`http://localhost:5001/api/popular-params?era=${era}&country=${location}&genre=${selectedGenre}&key=${selectedKey.value}`);
-            
-            const data = await response.json();
-            console.log("Fetched popular parameters:", data);
-            setPopularParams(data);
-    
-        } catch (error) {
-            console.error("Error fetching popular parameters:", error);
-        }
-    };
-    
-    if (era && location && selectedGenre && selectedKey.value) {
-        fetchPopularParams();
-    }
-    
 
-    const handleEraChange = (e) => {
-        const selectedEra = e.target.value;
-        setEra(selectedEra);
-    };
-
+    // hnadle the change in search text
     const handleSearchTextChange = (e) => {
         const newText = e.target.value;
         setSearchText(newText);
         console.log("Updated search text:", newText); // Add this line
     };
 
+    // used to populate camelot drop down
     useEffect(() => {
-        const fetchCamelotValues = async () => {
-            try {
-                const response = await fetch('http://localhost:5001/api/camelot');
-                const data = await response.json();
-                setCamelot(data);
-            } catch (error) {
-                console.error('Error fetching Camelot values:', error);
-            }
-        };
-
-        fetchCamelotValues();
+            const fetchCamelotValues = async () => {
+                try {
+                    const response = await fetch('http://localhost:5001/api/camelot');
+                    const data = await response.json();
+                    setCamelot(data);
+                } catch (error) {
+                    console.error('Error fetching Camelot values:', error);
+                }
+            };
+    
+            fetchCamelotValues();
     }, []);
 
-    useEffect(() => {
-        const fetchCommonInstruments = async () => {
-            try {
-                const response = await fetch(`http://localhost:5001/api/popular-instruments?era=${era}&genre=${selectedGenre}`);
-                const data = await response.json();
-                setCommonInstruments(data);
-            } catch (error) {
-                console.error("Error fetching common instruments:", error);
-            }
-        };
-
-        if (era && selectedGenre) {
-            fetchCommonInstruments();
-        }
-    }, [era, selectedGenre]);
-
+    // used to populate instrument drop down
     useEffect(() => {
         const fetchInstruments = async () => {
             try {
@@ -167,6 +145,7 @@ const EraYearComponent = (props) => {
         fetchInstruments();
     }, []);
 
+    // used to populate genre drop down
     useEffect(() => {
         const fetchGenres = async () => {
             try {
@@ -181,6 +160,7 @@ const EraYearComponent = (props) => {
         fetchGenres();
     }, []);
     
+    // used to populate key drop down
     useEffect(() => {
         const fetchKeys = async () => {
             try {
@@ -196,6 +176,7 @@ const EraYearComponent = (props) => {
         fetchKeys();
     }, []);
     
+    // used to populate location drop down
     useEffect(() => {
         const fetchCountries = async () => {
             try {
@@ -210,31 +191,8 @@ const EraYearComponent = (props) => {
     
         fetchCountries();
     }, []);
-
-    useEffect(() => {
-        const fetchPopularParams = async () => {
-            try {
-                const response = await fetch(`http://localhost:5001/api/popular-params?era=${era}&country=${location}&genre=${selectedGenre}`);
-                
-                const data = await response.json();
-                console.log("Fetched popular parameters:", data);  // This line logs the fetched data
-                setPopularParams(data);
     
-            } catch (error) {
-                console.error("Error fetching popular parameters:", error);
-            }
-        };
-    
-        if (era && location && selectedGenre) {
-            fetchPopularParams();
-        }
-    }, [era, location, selectedGenre]);
-    
-    useEffect(() => {
-        console.log("Popular Parameters State:", popularParams);
-    }, [popularParams]);
-    
-
+    // JSX (front end) visuals
     return (
         <Container className="mt-4 shadow">
             <h2 className="text-center mb-4">Advanced Search</h2>
@@ -242,9 +200,17 @@ const EraYearComponent = (props) => {
             {/* First Row */}
             <Row className="mb-3">
                 <Col md={3}>
-                    <Form.Group controlId="era">
-                        <Form.Label>Era:</Form.Label>
-                        <Form.Control as="select" value={era} onChange={handleEraChange}>
+                <Form.Group controlId="eraYearToggle">
+                <Form.Label>Show:</Form.Label>
+                <Button onClick={handleEraYearToggle}>
+                    {showEra ? "Year Slider" : "Era Dropdown"}
+                </Button>
+            </Form.Group>
+
+            {showEra ? (
+                <Form.Group controlId="era">
+                    <Form.Label>Era:</Form.Label>
+                    <Form.Control as="select" value={era} onChange={handleEraChange}>
                             <option value="">Select an Era</option>
                             <option value="1950s">1950s</option>
                             <option value="1960s">1960s</option>
@@ -255,7 +221,20 @@ const EraYearComponent = (props) => {
                             <option value="2010s">2010s</option>
                             <option value="2020s">2020s</option>
                             </Form.Control>
-                    </Form.Group>
+                            </Form.Group>
+            ) : (
+                <Form.Group controlId="year">
+                    <Form.Label>Year:</Form.Label>
+                    <Form.Control 
+                        type="range" 
+                        min="1958" 
+                        max="2023" 
+                        value={year} 
+                        onChange={handleYearChange}
+                    />
+                    <div>{year}</div>
+                </Form.Group>
+                )}
                 </Col>
 
                 <Col md={3}>
@@ -397,6 +376,8 @@ const EraYearComponent = (props) => {
                     <SearchButton 
                         className="custom-btn" // Apply the custom class
                         era={era} 
+                        showEra={showEra}
+                        year={year}
                         chartPos={chartPos} 
                         location={location} 
                         selectedKey={selectedKey} 
@@ -407,7 +388,6 @@ const EraYearComponent = (props) => {
                         selectedInstruments={selectedInstruments}
                         searchText={searchText} 
                         onSearchResults={setSongs} 
-                        onPopularParams={setPopularParams} 
                     />
                 </Col>
             </Row>

@@ -3,16 +3,19 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import './App.css';
 import AdvancedSearchComponent from './components/AdvancedSearchComponent';
 import CreateComponent from './components/CreateComponent';
-import CSVUpload from './components/CSVUpload';  // Import the CSVUpload component
+import CSVUpload from './components/CSVUpload';
 import { Container, Navbar, Nav } from 'react-bootstrap';
-
-
+import { useGlobalVoiceCommands } from './components/VoiceCommandManager';
+import AssistantComponent from './components/AssistantComponent'; 
 
 function App() {
+    useGlobalVoiceCommands(); 
     return (
         <Router>
             <div className="App">
                 {/* Header with navigation links */}
+                {/* Add this line to include the Assistant */}
+                <AssistantComponent />
                 <Navbar bg="dark" variant="dark" expand="lg">
                     <Container>
                         <Navbar.Brand href="#">Tamber</Navbar.Brand>
