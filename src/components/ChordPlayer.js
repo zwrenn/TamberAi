@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import ChordButton from './ChordButton';
-import { Howl } from 'howler';
+import React, { useState } from "react";
+import ChordButton from "./ChordButton";
+import { Howl } from "howler";
 
 function ChordPlayer() {
-  const [chordInput, setChordInput] = useState('');
+  const [chordInput, setChordInput] = useState("");
 
   // Define your chord-to-frequencies map
   const chordFrequenciesMap = {
@@ -20,7 +20,7 @@ function ChordPlayer() {
 
   function playChord(chordFrequencies) {
     const sound = new Howl({
-      src: ['/path/to/chord-sound.mp3'], // Replace with actual sample path
+      src: ["/path/to/chord-sound.mp3"], // Replace with actual sample path
       volume: 0.5,
       onload: () => {
         sound.play();
@@ -47,12 +47,12 @@ function ChordPlayer() {
           type="text"
           id="chordInput"
           value={chordInput}
-          onChange={e => setChordInput(e.target.value)}
+          onChange={(e) => setChordInput(e.target.value)}
         />
         <button onClick={handlePlayButtonClick}>Play Chord</button>
       </div>
       <div className="chord-buttons">
-        {predefinedChords.map(chordName => (
+        {predefinedChords.map((chordName) => (
           <ChordButton
             key={chordName}
             chordName={chordName}

@@ -1,13 +1,13 @@
-import React from 'react';
-import styled from 'styled-components';
-import NewInfluencerComponent from './NewInfluencerComponent';
-import ChatWidget from './ChatWidget';
-import ChordPlayer from './ChordPlayer'; // Import the ChordPlayer component
+import React from "react";
+import styled from "styled-components";
+import NewInfluencerComponent from "./NewInfluencerComponent";
+import ChatWidget from "./ChatWidget";
+import ChordPlayer from "./ChordPlayer"; // Import the ChordPlayer component
 
 const StyledCreateComponent = styled.div`
   background-color: #111;
   color: #fff;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,11 +19,11 @@ const StyledCreateComponent = styled.div`
 const CreateComponent = () => {
   return (
     <StyledCreateComponent>
-      <NewInfluencerComponent style={{ marginBottom: '20px' }} />
-      <ChatWidget style={{ marginBottom: '20px' }} />
+      <NewInfluencerComponent style={{ marginBottom: "20px" }} />
+      <ChatWidget style={{ marginBottom: "20px" }} />
       <ChordPlayer /> {/* Integrate the ChordPlayer component */}
     </StyledCreateComponent>
   );
-}
+};
 
 export default CreateComponent;

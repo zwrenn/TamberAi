@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
 function ChordButton({ chordName, onClick }) {
-  return (
-    <button onClick={onClick}>{chordName}</button>
-  );
+  return <button onClick={onClick}>{chordName}</button>;
 }
 
 export default ChordButton;

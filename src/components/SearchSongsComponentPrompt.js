@@ -1,7 +1,7 @@
 import React from "react";
 import { Table } from "react-bootstrap";
 
-const SearchSongsComponent = ({
+const SearchSongsComponentPrompt = ({
   songs,
   keysignatures,
   genres,
@@ -9,6 +9,10 @@ const SearchSongsComponent = ({
   camelot,
   onSongClick,
 }) => {
+  // Logging the props to see their values
+  console.log("Songs:", songs);
+  console.log("Keys:", keysignatures);
+  console.log("Genres:", genres);
   const keynameMap = {};
   keysignatures.forEach((keysignature) => {
     keynameMap[keysignature.keysignatureid] = keysignature.keyname;
@@ -118,4 +122,4 @@ const SearchSongsComponent = ({
   );
 };
 
-export default SearchSongsComponent;
+export default SearchSongsComponentPrompt;
