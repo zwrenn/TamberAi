@@ -2,7 +2,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./SpotifyPlayer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHeart,
+  faStepBackward,
+  faPlay,
+  faPause,
+  faStepForward,
+} from "@fortawesome/free-solid-svg-icons";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+
+let setSdkState; // Declare a variable in the outer scope
+
+// Define the global function
+window.onSpotifyWebPlaybackSDKReady = () => {
+  console.log("Spotify SDK Ready Callback Triggered");
+  if (setSdkState) setSdkState(true);
+};
 
 const hash = window.location.hash
   .substring(1)
@@ -21,8 +36,8 @@ const SpotifyPlayer = ({ trackUri }) => {
   console.log("SpotifyPlayer received trackUri:", trackUri);
 
   const playerRef = useRef(null);
-  const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [isSdkReady, setSdkReady] = useState(window.Spotify !== undefined);
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -33,14 +48,42 @@ const SpotifyPlayer = ({ trackUri }) => {
     albumCover: "",
   });
 
-  useEffect(() => {
-    if (!isSdkReady) {
-      window.onSpotifyWebPlaybackSDKReady = () => {
-        console.log("Spotify SDK Ready Callback Triggered");
-        setSdkReady(true);
-      };
+  const handlePreviousTrack = () => {
+    if (playerRef.current) {
+      playerRef.current
+        .previousTrack()
+        .then(() => {
+          console.log("Set to previous track");
+        })
+        .catch((error) => {
+          console.error("Error setting to previous track:", error);
+        });
+    } else {
+      console.warn("Player reference is null or undefined");
     }
-  }, [isSdkReady]);
+  };
+
+  const handleNextTrack = () => {
+    if (playerRef.current) {
+      playerRef.current
+        .nextTrack()
+        .then(() => {
+          console.log("Set to next track");
+        })
+        .catch((error) => {
+          console.error("Error setting to next track:", error);
+        });
+    } else {
+      console.warn("Player reference is null or undefined");
+    }
+  };
+
+  useEffect(() => {
+    setSdkState = setSdkReady;
+    return () => {
+      setSdkState = null;
+    }; // Cleanup on unmount
+  }, []);
 
   useEffect(() => {
     let interval;
@@ -110,6 +153,12 @@ const SpotifyPlayer = ({ trackUri }) => {
       clearInterval(interval);
     };
   }, [isSdkReady]);
+
+  useEffect(() => {
+    if (window.Spotify) {
+      setSdkReady(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (trackUri && isPlayerReady) {
@@ -251,9 +300,10 @@ const SpotifyPlayer = ({ trackUri }) => {
     <div className="spotify-player">
       <div className="track-info">
         <FontAwesomeIcon
+          className="like-icon"
           icon={faHeart}
           onClick={handleLike}
-          style={{ color: isLiked ? "red" : "gray", cursor: "pointer" }}
+          style={{ color: isLiked ? "lime" : "gray", cursor: "pointer" }}
         />
         <img
           src={trackDetails.albumCover}
@@ -266,24 +316,35 @@ const SpotifyPlayer = ({ trackUri }) => {
         </div>
       </div>
       <div className="controls">
-        <button className="prev-track">Previous</button>
-        <button onClick={handlePlay}>Play</button>
-        <button onClick={handlePause}>Pause</button>
-        <button className="next-track">Next</button>
+        <input
+          type="range"
+          value={position}
+          max={duration}
+          onChange={handleScrub}
+          style={{ width: "250%" }}
+        />
+        <div className="buttons">
+          <button className="prev-track" onClick={handlePreviousTrack}>
+            <FontAwesomeIcon icon={faStepBackward} />
+          </button>
+          <button onClick={handlePlay}>
+            <FontAwesomeIcon icon={faPlay} />
+          </button>
+          <button onClick={handlePause}>
+            <FontAwesomeIcon icon={faPause} />
+          </button>
+          <button className="next-track" onClick={handleNextTrack}>
+            <FontAwesomeIcon icon={faStepForward} />
+          </button>
+        </div>
       </div>
-      <input
-        type="range"
-        value={position}
-        max={duration}
-        onChange={handleScrub}
-        style={{ width: "100%" }}
-      />
       <div className="auth-controls">
         <a
           href="https://accounts.spotify.com/authorize?client_id=e74b4171efe74283b6e4f39d226eb8a7&redirect_uri=http://localhost:3000/&scope=streaming user-read-email user-read-private user-library-modify&response_type=token"
           className="spotify-login"
+          onClick={() => console.log("Login button clicked!")}
         >
-          Login with Spotify
+          Login <FontAwesomeIcon icon={faSpotify} />
         </a>
       </div>
     </div>

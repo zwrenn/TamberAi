@@ -1,8 +1,35 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import EraYearComponent from "./EraYearComponent";
-import "./AdvancedSearchComponent.css";
 import SpotifyPlayer from "./SpotifyPlayer";
+import styled from "styled-components";
+
+const StyledHeader = styled.h2`
+  font-weight: bolder;
+  margin-bottom: 0.5rem;
+`;
+
+const StyledSubtitle = styled.p`
+  font-size: 1.4rem;
+`;
+
+const StyledRoundedDiv = styled.div`
+  border-radius: 15px;
+  padding: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const StyledPlayer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #222;
+  z-index: 1000;
+  padding: 10px;
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+`;
 
 const convertUrlToURI = (url) => {
   return url
@@ -22,23 +49,18 @@ const AdvancedSearchComponent = () => {
       <Container className="mt-5">
         <Row className="justify-content-center">
           <Col lg={80}>
-            {" "}
-            {/* Adjusted the column size */}
             <div className="text-center mb-5">
-              {/* Add any content you want above the EraYearComponent */}
+              <StyledHeader className="display-4">Advanced Search</StyledHeader>
             </div>
-            <div className="rounded p-4 shadow my-4">
-              {" "}
-              {/* Adjusted padding and margin */}
+            <StyledRoundedDiv>
               <EraYearComponent onTrackSelect={handleTrackSelect} />
-            </div>
-            {/* Add any content you want below the EraYearComponent */}
+            </StyledRoundedDiv>
           </Col>
         </Row>
       </Container>
-      <div className="spotify-sticky-footer">
+      <StyledPlayer>
         <SpotifyPlayer trackUri={currentTrackUri} />
-      </div>
+      </StyledPlayer>
     </>
   );
 };

@@ -8,14 +8,13 @@ openai.apiKey = apiKey;
 
 function LyricsGenerator() {
   const [generatedLyrics, setGeneratedLyrics] = useState("");
+  const [highlightedLyrics, setHighlightedLyrics] = useState([]); // New state, array of highlighted indices
   const [selectedParameters, setSelectedParameters] = useState({
-    // Initialize your selected parameters here
     era: "",
     genre: "",
-    // ... other parameters
   });
-  const [loading, setLoading] = useState(false); // New state
-  const [loadingPercentage, setLoadingPercentage] = useState(0); // New state
+  const [loading, setLoading] = useState(false);
+  const [loadingPercentage, setLoadingPercentage] = useState(0);
 
   async function generateLyrics(parameters) {
     const prompt = `Generate lyrics in the style of a ${parameters.era} ${parameters.genre} song with the following parameters:
@@ -32,13 +31,14 @@ function LyricsGenerator() {
 
   async function handleGenerateLyrics() {
     setLoading(true);
-    setLoadingPercentage(0); // Reset percentage
+    setLoadingPercentage(0);
 
     const generatedText = await generateLyrics(selectedParameters);
-    setLoading(false); // Hide loader after completion
-    setLoadingPercentage(100); // Set to 100% on completion
+    setLoading(false);
+    setLoadingPercentage(100);
 
     setGeneratedLyrics(generatedText);
+    setHighlightedLyrics([]); // Reset the highlighted lyrics
   }
 
   useEffect(() => {
@@ -51,6 +51,16 @@ function LyricsGenerator() {
       return () => clearInterval(interval); // Cleanup interval on unmount or completion
     }
   }, [loading, loadingPercentage]);
+
+  // Rendering logic to include highlights
+  const renderLyrics = () => {
+    return generatedLyrics.split(" ").map((word, index) => {
+      if (highlightedLyrics.includes(index)) {
+        return <span className="highlighted">{word} </span>;
+      }
+      return `${word} `;
+    });
+  };
 
   return (
     <div>
@@ -82,7 +92,7 @@ function LyricsGenerator() {
       )}
       <div>
         <h2>Generated Lyrics:</h2>
-        <p>{generatedLyrics}</p>
+        <p>{renderLyrics()}</p> {/* Render lyrics with highlights */}
       </div>
     </div>
   );

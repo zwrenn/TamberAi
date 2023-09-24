@@ -1,120 +1,138 @@
-/* EraYearComponent.css */
-
+/* Background for the entire page */
 body {
-  background-color: #1a1a1a;
-  color: #eee;
-  font-family: Arial, sans-serif;
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+    color: #eee;
+    font-family: Arial, sans-serif;
 }
 
+/* Container with glass-like effect */
 .container {
-  background-color: #282c34;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    backdrop-filter: blur(10px); /* Apply a blur effect to the content behind the container */
+    margin: 20px; /* Add some margin for spacing */
+    opacity: 0.9; /* Adjust the opacity as needed */
 }
 
 h2 {
-  border-bottom: 2px solid #555;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  font-size: 24px;
+    border-bottom: 2px solid #555;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 24px;
 }
 
 .form-label {
-  color: #ddd;
-  font-weight: bold;
+    color: #ddd;
+    font-weight: bold;
 }
 
 .form-control, select, [type="number"], [type="text"] {
-  padding: 0.5rem 1rem;
-  position: relative;
-  background-color: #3b3b3b;
-  color: #ddd;
-  border: none;
-  border-radius: 5px;
+    padding: 0.5rem 1rem;
+    position: relative;
+    background-color: #3b3b3b;
+    color: #ddd;
+    border: none;
+    border-radius: 5px;
 }
 
 .form-control::before, select::before, [type="number"]::before, [type="text"]::before {
-  content: "";
-  position: absolute;
-  top: -16px;
-  left: -16px;
-  right: -16px;
-  bottom: -16px;
-  background: linear-gradient(45deg, transparent 40%, #000 40%);
-  z-index: -1;
-  border-radius: 10px;
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    background: linear-gradient(45deg, transparent 40%, #000 40%);
+    z-index: -1;
+    border-radius: 10px;
 }
 
 .form-control:focus, select:focus, [type="number"]:focus, [type="text"]:focus {
-  background-color: #4d4d4d;
-  color: #eee;
-  border: none;
-  box-shadow: 0 0 5px #61dafb;
+    background-color: #4d4d4d;
+    color: #eee;
+    border: none;
+    box-shadow: 0 0 5px #61dafb;
 }
 
-.custom-btn {
-  background-color: #696969;
-  border-color: #646464;
-  color: #1a1a1a;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+/* Base Button with Pink Glass Effect */
+.btn-search {
+    /* background-image: url('../../public/shape-30.png'); /* replace with your image path */
+    background-size: cover; /* ensures the image covers the entire button */
+    background-repeat: no-repeat; /* ensures the image doesn't repeat */
+    background-position: center; /* centers the image */
+    color: #eee !important;
+    border: 2px solid rgba(255, 105, 180, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 6px rgba(255, 105, 180, 0.2) !important;
+    transition: all 0.3s !important;
 }
 
-.custom-btn:hover {
-  background-color: #929292;
-  border-color: #969696;
-  transform: scale(1.05);
+/* Hover State */
+.btn-search:hover {
+    background-color: rgba(255, 85, 165, 0.4) !important;   /* Slightly darker pink on hover */
+    border-color: rgba(255, 85, 165, 0.6) !important;
+    transform: scale(1.05) !important;                      /* Slightly scale the button */
+}
+
+/* Active (Clicked) State */
+.btn-search:active {
+    background-color: rgba(255, 65, 150, 0.5) !important;   /* Even darker pink on active */
+    border-color: rgba(255, 65, 150, 0.7) !important;
+    transform: scale(1.02) !important;
+}
+
+/* Focused (For Accessibility) */
+.btn-search:focus {
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.7), 0 4px 6px rgba(255, 105, 180, 0.2) !important; /* Pink glow for focus */
 }
 
 /* Adjust react-select dropdown styling to match the theme */
 .react-select__control {
-  background-color: #3b3b3b;
-  border: none;
-  position: relative;
+    background-color: #3b3b3b;
+    border: none;
+    position: relative;
 }
 
 .react-select__control::before {
-  content: "";
-  position: absolute;
-  top: -16px;
-  left: -16px;
-  right: -16px;
-  bottom: -16px;
-  background: linear-gradient(45deg, transparent 40%, #000 40%);
-  z-index: -1;
-  border-radius: 10px;
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    background: linear-gradient(45deg, transparent 40%, #000 40%);
+    z-index: -1;
+    border-radius: 10px;
 }
 
 .react-select__menu {
-  background-color: #282c34;
-  position: relative;
+    background-color: #282c34;
+    position: relative;
 }
 
 .react-select__menu::before {
-  content: "";
-  position: absolute;
-  top: -16px;
-  left: -16px;
-  right: -16px;
-  bottom: -16px;
-  background: linear-gradient(45deg, transparent 40%, #000 40%);
-  z-index: -1;
-  border-radius: 10px;
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    background: linear-gradient(45deg, transparent 40%, #000 40%);
+    z-index: -1;
+    border-radius: 10px;
 }
 
 .react-select__option {
-  color: #eee;
+    color: #3b3b3b;
 }
 
 .react-select__option--is-focused {
-  background-color: #3b3b3b;
+    background-color: #3b3b3b;
 }
 
 .react-select__option--is-selected {
-  background-color: #949494;
-  color: #1a1a1a;
+    background-color: #949494;
+    color: #1a1a1a;
 }

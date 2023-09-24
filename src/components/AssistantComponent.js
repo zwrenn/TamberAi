@@ -46,7 +46,7 @@ const searchDatabase = async (inferredMood) => {
 };
 
 const AssistantComponent = () => {
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   // eslint-disable-next-line

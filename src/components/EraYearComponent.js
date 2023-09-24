@@ -10,63 +10,75 @@ import axios from "axios";
 
 const OPENAI_API_KEY = "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";
 
-const IndentedSelect = styled(Form.Control)`
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
-  width: 100%;
-`;
+// const IndentedSelect = styled(Form.Control)`
+//   box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
+//   width: 100%;
+// `;
 
 const FullWidthLabel = styled(Form.Label)`
   display: block;
   width: 100%;
 `;
 
-const ZoeDiv = styled(Form.Control)`
-  border: 0.1rem solid #dbe0eb;
-  border-radius: 0.3rem;
+const SelectStyled = styled(Select)`
+  border-radius: 10px;
 `;
 
-const darkThemeStyles = {
-  control: (base, state) => ({
-    ...base,
-    backgroundColor: "#3b3b3b",
-    borderColor: state.isFocused ? "#61dafb" : "#282c34",
-    boxShadow: state.isFocused ? "0 0 0 1px #61dafb" : null,
-    "&:hover": {
-      borderColor: "#61dafb",
-    },
-  }),
-  menu: (base) => ({
-    ...base,
-    backgroundColor: "#282c34",
-    color: "#eee",
-  }),
-  option: (base, state) => ({
-    ...base,
-    backgroundColor: state.isFocused ? "#3b3b3b" : null,
-    color: state.isFocused ? "#eee" : base.color,
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "#eee",
-  }),
-  multiValue: (base) => ({
-    ...base,
-    backgroundColor: "#3b3b3b",
-    color: "#eee",
-  }),
-  multiValueLabel: (base) => ({
-    ...base,
-    color: "#eee",
-  }),
-  multiValueRemove: (base) => ({
-    ...base,
-    color: "#eee",
-    "&:hover": {
-      backgroundColor: "#61dafb",
-      color: "#1a1a1a",
-    },
+// Change state of dropdown options
+const customStyles = {
+  option: (provided, state) => ({
+    ...provided,
+    color: "black",
   }),
 };
+
+// const ZoeDiv = styled(Form.Control)`
+//   border: 0.1rem solid #dbe0eb;
+//   border-radius: 0.3rem;
+// `;
+
+// const darkThemeStyles = {
+//   control: (base, state) => ({
+//     ...base,
+//     backgroundColor: "#3b3b3b",
+//     borderColor: state.isFocused ? "#61dafb" : "#282c34",
+//     boxShadow: state.isFocused ? "0 0 0 1px #61dafb" : null,
+//     "&:hover": {
+//       borderColor: "#61dafb",
+//     },
+//   }),
+//   menu: (base) => ({
+//     ...base,
+//     backgroundColor: "#282c34",
+//     color: "#eee",
+//   }),
+//   option: (base, state) => ({
+//     ...base,
+//     backgroundColor: state.isFocused ? "#3b3b3b" : null,
+//     color: state.isFocused ? "#eee" : base.color,
+//   }),
+//   singleValue: (base) => ({
+//     ...base,
+//     color: "#eee",
+//   }),
+//   multiValue: (base) => ({
+//     ...base,
+//     backgroundColor: "#3b3b3b",
+//     color: "#eee",
+//   }),
+//   multiValueLabel: (base) => ({
+//     ...base,
+//     color: "#eee",
+//   }),
+//   multiValueRemove: (base) => ({
+//     ...base,
+//     color: "#eee",
+//     "&:hover": {
+//       backgroundColor: "#61dafb",
+//       color: "#1a1a1a",
+//     },
+//   }),
+// };
 
 const EraYearComponent = (props) => {
   // This function is triggered when a song is clicked.
@@ -283,22 +295,35 @@ const EraYearComponent = (props) => {
   // JSX (front end) visuals
   return (
     <Container className="mt-4 shadow">
-      <h2 className="text-center mb-4">Advanced Search</h2>
-
-      {/* First Row */}
       <Row className="mb-3">
         <Col md={3}>
-          <Form.Group controlId="eraYearToggle">
-            <Form.Label>Show:</Form.Label>
-            <Button onClick={handleEraYearToggle}>
-              {showEra ? "Year Slider" : "Era Dropdown"}
-            </Button>
+          <Form.Group controlId="eraYearToggle" className="mb-2">
+            <span
+              style={{
+                fontWeight: showEra ? "bold" : "normal",
+                color: showEra ? "white" : "grey",
+                cursor: "pointer",
+                marginRight: "10px",
+              }}
+              onClick={() => handleEraYearToggle(true)}
+            >
+              {showEra ? "Era:" : "Era"}
+            </span>
+            <span
+              style={{
+                fontWeight: !showEra ? "bold" : "normal",
+                color: !showEra ? "white" : "grey",
+                cursor: "pointer",
+              }}
+              onClick={() => handleEraYearToggle(false)}
+            >
+              {!showEra ? "Year:" : "Year"}
+            </span>
           </Form.Group>
 
           {showEra ? (
             <Form.Group controlId="era">
-              <Form.Label>Era:</Form.Label>
-              <ZoeDiv as="select" value={era} onChange={handleEraChange}>
+              <Form.Control as="select" value={era} onChange={handleEraChange}>
                 <option value="">Select an Era</option>
                 <option value="1950s">1950s</option>
                 <option value="1960s">1960s</option>
@@ -308,11 +333,10 @@ const EraYearComponent = (props) => {
                 <option value="2000s">2000s</option>
                 <option value="2010s">2010s</option>
                 <option value="2020s">2020s</option>
-              </ZoeDiv>
+              </Form.Control>
             </Form.Group>
           ) : (
             <Form.Group controlId="year">
-              <Form.Label>Year:</Form.Label>
               <Form.Control
                 type="range"
                 min="1958"
@@ -328,7 +352,7 @@ const EraYearComponent = (props) => {
         <Col md={3}>
           <Form.Group controlId="key">
             <FullWidthLabel>Key:</FullWidthLabel>
-            <IndentedSelect
+            <Form.Control
               as="select"
               value={selectedKey.value}
               onChange={(e) => {
@@ -340,12 +364,14 @@ const EraYearComponent = (props) => {
               }}
             >
               <option value="">Select a Key</option>
-              {keys.map((key) => (
-                <option key={key.keysignatureid} value={key.keyname}>
-                  {key.keyname}
-                </option>
-              ))}
-            </IndentedSelect>
+              {keys
+                .sort((a, b) => a.keyname.localeCompare(b.keyname))
+                .map((key) => (
+                  <option key={key.keysignatureid} value={key.keyname}>
+                    {key.keyname}
+                  </option>
+                ))}
+            </Form.Control>
           </Form.Group>
         </Col>
 
@@ -382,19 +408,19 @@ const EraYearComponent = (props) => {
         <Col md={3}>
           <Form.Group controlId="instruments">
             <Form.Label>Instruments:</Form.Label>
-            <Select
+            <SelectStyled
               isMulti
               options={instruments.map((instrument) => ({
                 value: instrument.instrument_id,
                 label: instrument.instrument_name,
               }))}
+              styles={customStyles}
               onChange={(selectedOptions) => {
                 const selectedValues = selectedOptions
                   ? selectedOptions.map((option) => option.value)
                   : [];
                 setSelectedInstruments(selectedValues);
               }}
-              styles={darkThemeStyles} // Apply the custom styles here
             />
           </Form.Group>
         </Col>
@@ -408,11 +434,13 @@ const EraYearComponent = (props) => {
               onChange={(e) => setSelectedGenre(e.target.value)}
             >
               <option value="">Select a Genre</option>
-              {genres.map((genre) => (
-                <option key={genre.genre_id} value={genre.genre_id}>
-                  {genre.genre_name}
-                </option>
-              ))}
+              {genres
+                .sort((a, b) => a.genre_name.localeCompare(b.genre_name))
+                .map((genre) => (
+                  <option key={genre.genre_id} value={genre.genre_id}>
+                    {genre.genre_name}
+                  </option>
+                ))}
             </Form.Control>
           </Form.Group>
         </Col>
@@ -490,7 +518,7 @@ const EraYearComponent = (props) => {
       <Row className="mt-4 mb-4">
         <Col className="text-center">
           <SearchButton
-            className="custom-btn" // Apply the custom class
+            className="btn-search" // Apply the custom class
             era={era}
             showEra={showEra}
             year={year}

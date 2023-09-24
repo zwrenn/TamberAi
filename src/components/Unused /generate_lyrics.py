@@ -1,75 +1,69 @@
 import sys
 import openai
-import os
 import json
+import re  # Importing the Regular Expressions library
+from openai import Tokenizer
 
+# Initialize
 print("Initializing script...")
-
-# Read OpenAI API key from environment variables
 openai.api_key = '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'
-
 print("API Key Set.")
 
-def generate_lyrics(prompt, max_tokens=200, engine="text-davinci-003"):
-    print(f"Generating lyrics with prompt: {prompt}, max_tokens: {max_tokens}, engine: {engine}")
-    response = openai.Completion.create(
-        engine=engine,
-        prompt=prompt,
-        max_tokens=max_tokens
-    )
-    print("Lyrics generated.")
-    return response.choices[0].text
+# Initialize the tokenizer
+tokenizer = Tokenizer()
 
-def generate_iterative_lyrics(existing_lyrics, old_lyrics, max_tokens=200):
-    print("Generating iterative lyrics...")
-    new_lyrics = []
-    old_lyrics_list = old_lyrics.split('\n')
-    existing_lyrics_list = existing_lyrics.split('\n')
-    
-    for line in old_lyrics_list:
-        print(f"Processing line: {line}")
-        if line in existing_lyrics_list:  # Check if the line is to be kept
-            new_lyrics.append(line)
-        else:
-            prompt = "\n".join(existing_lyrics_list)
-            generated_line = generate_lyrics(prompt, max_tokens=20)
-            new_lyrics.append(generated_line.strip())
-            
-    print("Iterative lyrics generated.")
-    return '\n'.join(new_lyrics)
+# Function to count tokens
 
-def get_language_based_on_genre(genre):
-    if genre == "54":
-        return "French", "text-davinci-003-fr"
-    elif genre == "Schlager":
-        return "German", "text-davinci-003-de"
-    else:
-        return "English", "text-davinci-003"
 
-# Logging: Language and Engine
-print(f"Language: {language}, Engine: {engine}")
+def count_tokens(text):
+    tokens = tokenizer.tokenize(text)
+    return len(tokens)
 
+# Function to generate lyrics
+
+
+def generate_lyrics(prompt, max_tokens, engine="text-davinci-003"):
+    try:
+        response = openai.Completion.create(
+            engine=engine,
+            prompt=prompt,
+            max_tokens=max_tokens
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return ""
+
+
+# Main function
 if __name__ == "__main__":
-    # Logging: Script arguments received
-    print(f"Python script arguments received: {sys.argv}")
-    print("Python script arguments:", sys.argv)
     prompt = sys.argv[1]
-    max_tokens = int(sys.argv[2]) if len(sys.argv) > 2 else 200
-    highlighted_lines = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
-    existing_lyrics = sys.argv[4] if len(sys.argv) > 4 else ""
+    max_tokens = int(sys.argv[2])
+    structure = json.loads(sys.argv[7])  # Parsing the song structure
 
-    if highlighted_lines:
-        print("Received highlighted lines:", highlighted_lines)
-        highlighted_lines_str = "\n".join(list(highlighted_lines.values()))
-        lyrics = generate_iterative_lyrics(existing_lyrics, highlighted_lines_str, max_tokens)
-    elif existing_lyrics:
-        print("Received existing lyrics:", existing_lyrics)
-        lyrics = generate_iterative_lyrics(existing_lyrics, generate_lyrics(prompt, max_tokens), max_tokens)
-    else:
-        lyrics = generate_lyrics(prompt, max_tokens)
-    print("Python Script Args:", sys.argv)
-    print("Python Highlighted Lines:", highlighted_lines)
-    print("Generated Lyrics:", lyrics)
-    print(lyrics)
-    print("=== Python Script Ended ===")
+    # Count tokens in the prompt
+    prompt_tokens = count_tokens(prompt)
+    remaining_tokens = max_tokens - prompt_tokens
 
+    generated_lyrics = []
+
+    # Tokens allocation (You can adjust these numbers)
+    tokens_per_section = {
+        'Verse 1': 60,
+        'Chorus': 60,
+        'Verse 2': 60,
+        'Bridge': 60,
+        'Outro': 60
+    }
+
+    for section in structure:
+        allocated_tokens = min(tokens_per_section.get(
+            section, 40), remaining_tokens)
+        section_prompt = f"{section}:\n"
+        section_lyrics = generate_lyrics(section_prompt, allocated_tokens)
+        generated_lyrics.append(f"{section}:\n{section_lyrics}")
+        remaining_tokens -= allocated_tokens
+
+    # Joining all the sections to form the full lyrics
+    full_lyrics = '\n'.join(generated_lyrics)
+    print(full_lyrics)
