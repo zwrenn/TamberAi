@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import EraYearComponent from "../components/EraYearComponent";
 import SpotifyPlayer from "../components/SpotifyPlayer";
+import AssistantComponent from "../components/AssistantComponent"; // Step 1: Import AssistantComponent
 import styled from "styled-components";
 import "../components/theme/AdvancedSearchComponent.css";
 
@@ -50,6 +51,9 @@ const AdvancedSearchComponent = () => {
 
   return (
     <>
+      {/* AssistantComponent moved outside of Container */}
+      <AssistantComponent setSelectedTrackUri={handleTrackSelect} />
+
       <Container className="mt-5">
         <Row className="justify-content-center">
           <Col lg={80}>

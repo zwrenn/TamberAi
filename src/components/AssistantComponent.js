@@ -4,15 +4,11 @@ import "../components/theme/AssistantComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
 import { Button } from "react-bootstrap";
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 
 const processQueryWithGPT4 = async (query) => {
   try {
     const structuredPrompt = `Given the request '${query}', what are a few one word key musical descriptors?`;
-
-    // Debugging: Print the Authorization header
-    console.log("Authorization header:", `Bearer ${OPENAI_API_KEY}`);
-
     const response = await axios.post(
       "https://api.openai.com/v1/engines/text-davinci-003/completions",
       {
@@ -21,12 +17,11 @@ const processQueryWithGPT4 = async (query) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`, // Use the OPENAI_API_KEY constant here
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
       }
     );
-
     return response.data.choices[0].text.trim().split("\n");
   } catch (error) {
     console.error("Error processing query with GPT-4:", error);
@@ -36,11 +31,9 @@ const processQueryWithGPT4 = async (query) => {
 
 const searchDatabase = async (inferredMood) => {
   try {
-    // Extract individual moods from the received string
     const processedMoods = inferredMood[0]
       .split(",")
       .map((mood) => mood.trim().replace("'", ""));
-
     const response = await axios.post("http://localhost:5001/api/search-mood", {
       moodsFromGPT: processedMoods,
     });
@@ -51,11 +44,10 @@ const searchDatabase = async (inferredMood) => {
   }
 };
 
-const AssistantComponent = () => {
+const AssistantComponent = ({ setSelectedTrackUri }) => {
   const [showChat, setShowChat] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  // eslint-disable-next-line
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -63,19 +55,19 @@ const AssistantComponent = () => {
     addVoiceCommand("show assistant", () => setShowChat(true));
   }, []);
 
+  const handleSongClick = (spotifyLink) => {
+    if (typeof setSelectedTrackUri === "function") {
+      setSelectedTrackUri(spotifyLink);
+    } else {
+      console.error("setSelectedTrackUri is not a function");
+    }
+  };
+
   const handleSearch = async () => {
     try {
-      console.log("Sending query to GPT-4:", query);
       const inferredMood = await processQueryWithGPT4(query);
-      console.log("Received inferred mood from GPT-4:", inferredMood);
-
       const splitMoods = inferredMood[0].split(",").map((mood) => mood.trim());
-      console.log("Processed moods for database search:", splitMoods);
-
-      console.log("Sending inferred mood to backend:", splitMoods);
       const matchingSongs = await searchDatabase(splitMoods);
-      console.log("Received song matches from backend:", matchingSongs);
-
       setResults(matchingSongs);
     } catch (err) {
       console.error("Error in handleSearch:", err);
@@ -100,14 +92,16 @@ const AssistantComponent = () => {
           <Button onClick={handleSearch} className="mt-4">
             Search
           </Button>
-
           <div className="results">
             {results.length > 0 && (
               <div>
                 <p>Here are some song recommendations based on your search:</p>
                 <ul>
                   {results.map((song) => (
-                    <li key={song.id}>
+                    <li
+                      key={song.id}
+                      onClick={() => handleSongClick(song["Spotify Link"])}
+                    >
                       {song.title} by {song.artist}
                     </li>
                   ))}

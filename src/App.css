@@ -26,14 +26,11 @@
 }
 
 .navbar-icon {
-    width: 80px;
-    height: 80px;
+    width: 20px;
+    height: 20px;
     display: block;
     margin: 0 auto;
-    background-color: rgba(255, 182, 193, 0.2); /* Pink background */
-    backdrop-filter: blur(5px); /* Blur the content behind the image */
-    border-radius: 50%; /* Circular shape */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    font-size: 15px;
 }
 
 
@@ -90,13 +87,6 @@
     stroke: none;
 }
 
-/* Adjust the position of the SVG to move it upwards */
-.icon-text-container svg {
-    position: absolute;
-    top: -30px; /* Adjust this value to move the text up or down */
-    left: 0;
-    z-index: 1;
-}
 
 /* Logo spin animation */
 @keyframes App-logo-spin {

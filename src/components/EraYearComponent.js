@@ -6,6 +6,7 @@ import ChartPositionComponent from "./ChartPositionComponent";
 import Select from "react-select";
 import SearchSongsComponent from "./SearchSongsComponent";
 import "./EraYearComponent.css";
+import { addVoiceCommand } from "./VoiceCommandManager";
 import axios from "axios";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -31,54 +32,6 @@ const customStyles = {
     color: "black",
   }),
 };
-
-// const ZoeDiv = styled(Form.Control)`
-//   border: 0.1rem solid #dbe0eb;
-//   border-radius: 0.3rem;
-// `;
-
-// const darkThemeStyles = {
-//   control: (base, state) => ({
-//     ...base,
-//     backgroundColor: "#3b3b3b",
-//     borderColor: state.isFocused ? "#61dafb" : "#282c34",
-//     boxShadow: state.isFocused ? "0 0 0 1px #61dafb" : null,
-//     "&:hover": {
-//       borderColor: "#61dafb",
-//     },
-//   }),
-//   menu: (base) => ({
-//     ...base,
-//     backgroundColor: "#282c34",
-//     color: "#eee",
-//   }),
-//   option: (base, state) => ({
-//     ...base,
-//     backgroundColor: state.isFocused ? "#3b3b3b" : null,
-//     color: state.isFocused ? "#eee" : base.color,
-//   }),
-//   singleValue: (base) => ({
-//     ...base,
-//     color: "#eee",
-//   }),
-//   multiValue: (base) => ({
-//     ...base,
-//     backgroundColor: "#3b3b3b",
-//     color: "#eee",
-//   }),
-//   multiValueLabel: (base) => ({
-//     ...base,
-//     color: "#eee",
-//   }),
-//   multiValueRemove: (base) => ({
-//     ...base,
-//     color: "#eee",
-//     "&:hover": {
-//       backgroundColor: "#61dafb",
-//       color: "#1a1a1a",
-//     },
-//   }),
-// };
 
 const EraYearComponent = (props) => {
   // This function is triggered when a song is clicked.
@@ -110,6 +63,26 @@ const EraYearComponent = (props) => {
   const [results, setResults] = useState([]);
   // eslint-disable-next-line
   const [error, setError] = useState(null);
+  // Add voice command to set Era
+  useEffect(() => {
+    addVoiceCommand("set era to", (voiceParams) => {
+      const validEras = [
+        "1950s",
+        "1960s",
+        "1970s",
+        "1980s",
+        "1990s",
+        "2000s",
+        "2010s",
+        "2020s",
+      ];
+      if (validEras.includes(voiceParams)) {
+        setEra(voiceParams);
+      } else {
+        console.warn(`Invalid era specified: ${voiceParams}`);
+      }
+    });
+  }, []);
 
   const handleEraChange = (e) => {
     const selectedEra = e.target.value;
@@ -297,11 +270,11 @@ const EraYearComponent = (props) => {
     <Container>
       <Row className="mb-3">
         <Col md={3}>
-          <Form.Group controlId="eraYearToggle" className="mb-2">
+          <Form.Group controlId="eraYearToggle" className="mb-2 form-align">
             <span
               style={{
                 fontWeight: showEra ? "bold" : "normal",
-                color: showEra ? "white" : "grey",
+                color: showEra ? "black" : "grey",
                 cursor: "pointer",
                 marginRight: "10px",
               }}
@@ -312,7 +285,7 @@ const EraYearComponent = (props) => {
             <span
               style={{
                 fontWeight: !showEra ? "bold" : "normal",
-                color: !showEra ? "white" : "grey",
+                color: !showEra ? "black" : "grey",
                 cursor: "pointer",
               }}
               onClick={() => handleEraYearToggle(false)}
@@ -350,7 +323,7 @@ const EraYearComponent = (props) => {
         </Col>
 
         <Col md={3}>
-          <Form.Group controlId="key">
+          <Form.Group controlId="key" className="form-align">
             <FullWidthLabel>Key:</FullWidthLabel>
             <Form.Control
               as="select"
@@ -376,7 +349,7 @@ const EraYearComponent = (props) => {
         </Col>
 
         <Col md={3}>
-          <Form.Group controlId="location">
+          <Form.Group controlId="location" className="form-align">
             <Form.Label>Location:</Form.Label>
             <Form.Control
               as="select"

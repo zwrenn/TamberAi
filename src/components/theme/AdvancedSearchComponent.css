@@ -18,3 +18,11 @@ p.lead {
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
   /* Add more styling as needed */
 }
+
+.assistant-container {
+  position: fixed;
+  bottom: 30px; /* Moved up by 70px, clearing the 60px high Spotify player */
+  right: 15px;
+  z-index: 1001; /* Make sure it's above other items */
+}
+

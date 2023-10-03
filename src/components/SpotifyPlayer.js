@@ -42,6 +42,7 @@ const SpotifyPlayer = ({ trackUri }) => {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [deviceId, setDeviceId] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [trackDetails, setTrackDetails] = useState({
     title: "",
     artist: "",
@@ -220,6 +221,8 @@ const SpotifyPlayer = ({ trackUri }) => {
 
   const handlePlay = () => {
     console.log("Play button clicked.");
+    setIsPlaying(true);
+    console.log("Play button clicked.");
     if (!isPlayerReady) {
       console.warn("Player is not yet ready");
       return;
@@ -240,6 +243,8 @@ const SpotifyPlayer = ({ trackUri }) => {
   };
 
   const handlePause = () => {
+    console.log("Pause button clicked.");
+    setIsPlaying(false);
     console.log("Pause button clicked.");
     if (playerRef.current) {
       playerRef.current
@@ -305,11 +310,13 @@ const SpotifyPlayer = ({ trackUri }) => {
           onClick={handleLike}
           style={{ color: isLiked ? "#5478f0" : "gray", cursor: "pointer" }}
         />
-        <img
-          src={trackDetails.albumCover}
-          alt="Album Cover"
-          className="album-cover"
-        />
+        {trackDetails.albumCover && (
+          <img
+            src={trackDetails.albumCover}
+            alt="Album Cover"
+            className="album-cover"
+          />
+        )}
         <div className="track-details">
           <p className="track-title">{trackDetails.title}</p>
           <p className="track-artist">{trackDetails.artist}</p>
@@ -327,11 +334,8 @@ const SpotifyPlayer = ({ trackUri }) => {
           <button className="prev-track" onClick={handlePreviousTrack}>
             <FontAwesomeIcon icon={faStepBackward} />
           </button>
-          <button onClick={handlePlay}>
-            <FontAwesomeIcon icon={faPlay} />
-          </button>
-          <button onClick={handlePause}>
-            <FontAwesomeIcon icon={faPause} />
+          <button onClick={isPlaying ? handlePause : handlePlay}>
+            <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
           </button>
           <button className="next-track" onClick={handleNextTrack}>
             <FontAwesomeIcon icon={faStepForward} />

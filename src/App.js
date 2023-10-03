@@ -9,7 +9,12 @@ import CreateComponent from "./pages/CreateComponent";
 import CSVUpload from "./pages/CSVUpload";
 import { Navbar, Nav } from "react-bootstrap";
 import { useGlobalVoiceCommands } from "./components/VoiceCommandManager";
-import AssistantComponent from "./components/AssistantComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPencil,
+  faSearch,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 
 const VerticalNavbar = styled(Navbar)`
   flex-direction: column;
@@ -60,8 +65,6 @@ function App() {
 
   return (
     <Router>
-      {/* Assistant component */}
-      <AssistantComponent />
       <FlexContainer className="App">
         {/* Vertical Navbar on the left */}
         <VerticalNavbar bg="dark" variant="dark">
@@ -71,77 +74,19 @@ function App() {
             <Nav className="me-auto flex-column">
               <Nav.Link as={Link} to="/">
                 <div className="icon-text-container">
-                  <img
-                    src={process.env.PUBLIC_URL + "/shape-88.png"}
-                    alt="Search"
-                    className="navbar-icon"
-                  />
-                  <svg
-                    width="80"
-                    height="80"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      id="curvePath"
-                      className="text-path"
-                      d="M5 85 Q40 -10 85 70"
-                    />
-                    <text width="80" font-size="12px" fill="#fff">
-                      <textPath xlinkHref="#curvePath" startOffset="50%">
-                        Search
-                      </textPath>
-                    </text>
-                  </svg>
+                  <FontAwesomeIcon icon={faSearch} className="navbar-icon" />
                 </div>
               </Nav.Link>
               <Nav.Link as={Link} to="/create">
                 <div className="icon-text-container">
-                  <img
-                    src={process.env.PUBLIC_URL + "/shape-78.png"}
-                    alt="Search"
-                    className="navbar-icon2"
-                  />
-                  <svg
-                    width="80"
-                    height="80"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      id="curvePath"
-                      className="text-path"
-                      d="M5 85 Q40 -10 85 70"
-                    />
-                    <text width="80" font-size="12px" fill="#fff">
-                      <textPath xlinkHref="#curvePath" startOffset="50%">
-                        Create
-                      </textPath>
-                    </text>
-                  </svg>
+                  <FontAwesomeIcon icon={faPencil} className="navbar-icon" />
                 </div>
               </Nav.Link>
               <Nav.Link as={Link} to="/upload">
                 <div className="icon-text-container">
-                  <img
-                    src={process.env.PUBLIC_URL + "/shape-63.png"}
-                    alt="Search"
-                    className="navbar-icon3"
-                  />
-                  <svg
-                    width="80"
-                    height="80"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      id="curvePath"
-                      className="text-path"
-                      d="M5 85 Q40 -10 85 70"
-                    />
-                    <text width="80" font-size="12px" fill="#fff">
-                      <textPath xlinkHref="#curvePath" startOffset="50%">
-                        Upload
-                      </textPath>
-                    </text>
-                  </svg>
+                  <p>
+                    <FontAwesomeIcon icon={faUpload} className="navbar-icon" />
+                  </p>
                 </div>
               </Nav.Link>
             </Nav>
