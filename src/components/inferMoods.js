@@ -2,16 +2,16 @@ const axios = require("axios");
 const { Pool } = require("pg");
 
 // Your provided constants
-const OPENAI_API_KEY = "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";
-const DB_USER = "postgres";
-const DB_PASSWORD = "Wednesday@1240";
+// Use environment variables for sensitive information
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const PORT = 5001;
 
 const pool = new Pool({
-  user: DB_USER,
-  host: "localhost",
-  database: "Tamber",
-  password: DB_PASSWORD,
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 async function getSongsByPosition(offset, limit) {

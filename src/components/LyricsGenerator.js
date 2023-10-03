@@ -3,8 +3,8 @@ import openai from "openai";
 import "./LyricsGenerator.css";
 
 // Your OpenAI API key
-const apiKey = "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";
-openai.apiKey = apiKey;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+openai.apiKey = OPENAI_API_KEY;
 
 function LyricsGenerator() {
   const [generatedLyrics, setGeneratedLyrics] = useState("");

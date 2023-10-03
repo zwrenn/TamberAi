@@ -3,11 +3,15 @@ import React, { useState, useEffect } from "react";
 import "./AssistantComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 
 const processQueryWithGPT4 = async (query) => {
   try {
     const structuredPrompt = `Given the request '${query}', what are a few one word key musical descriptors?`;
+
+    // Debugging: Print the Authorization header
+    console.log("Authorization header:", `Bearer ${OPENAI_API_KEY}`);
+
     const response = await axios.post(
       "https://api.openai.com/v1/engines/text-davinci-003/completions",
       {
@@ -16,11 +20,12 @@ const processQueryWithGPT4 = async (query) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          Authorization: `Bearer ${OPENAI_API_KEY}`, // Use the OPENAI_API_KEY constant here
           "Content-Type": "application/json",
         },
       }
     );
+
     return response.data.choices[0].text.trim().split("\n");
   } catch (error) {
     console.error("Error processing query with GPT-4:", error);

@@ -14,8 +14,8 @@ import { addVoiceCommand } from "./VoiceCommandManager";
 import { styled } from "styled-components";
 
 // Your OpenAI API key
-const apiKey = "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";
-openai.apiKey = apiKey;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+openai.apiKey = OPENAI_API_KEY;
 
 const formatLyrics = (lyrics) => {
   // Remove any extraneous colons at the start or end of lines
