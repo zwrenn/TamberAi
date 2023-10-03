@@ -1,6 +1,6 @@
 /* global Spotify */
 import React, { useEffect, useRef, useState } from "react";
-import "./SpotifyPlayer.css";
+import "./theme/SpotifyPlayer.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeart,

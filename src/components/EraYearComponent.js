@@ -5,7 +5,7 @@ import SearchButton from "./SearchButton";
 import ChartPositionComponent from "./ChartPositionComponent";
 import Select from "react-select";
 import SearchSongsComponent from "./SearchSongsComponent";
-import "./EraYearComponent.css";
+import "./theme/EraYearComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
 import axios from "axios";
 

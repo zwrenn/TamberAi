@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import "./ChatWidget.css";
+import "./theme/ChatWidget.css";
 
 const ChatWidget = () => {
   const [messages, setMessages] = useState([]);

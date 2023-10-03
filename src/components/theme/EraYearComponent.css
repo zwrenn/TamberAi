@@ -119,7 +119,7 @@ h2 {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* Base Button with Pink Glass Effect */
+/* Base Button */
 .btn-search {
     background-color: #5478f0 !important;   /* Pink semi-transparent background */
     color: #eee !important;                                 

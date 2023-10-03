@@ -6,7 +6,7 @@ import {
   Button as BootstrapButton,
   Table,
 } from "react-bootstrap";
-import "./NewInfluencerComponent.css";
+import "./theme/NewInfluencerComponent.css";
 import axios from "axios";
 import openai from "openai";
 import { addVoiceCommand } from "./VoiceCommandManager";
