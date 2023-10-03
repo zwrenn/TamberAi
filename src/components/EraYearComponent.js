@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Container, Row, Col, Button } from "react-bootstrap";
+import { Form, Container, Row, Col } from "react-bootstrap";
 import styled from "styled-components";
 import SearchButton from "./SearchButton";
 import ChartPositionComponent from "./ChartPositionComponent";
@@ -294,7 +294,7 @@ const EraYearComponent = (props) => {
 
   // JSX (front end) visuals
   return (
-    <Container className="mt-4 shadow">
+    <Container>
       <Row className="mb-3">
         <Col md={3}>
           <Form.Group controlId="eraYearToggle" className="mb-2">
@@ -515,7 +515,7 @@ const EraYearComponent = (props) => {
         </Col>
       </Row>
 
-      <Row className="mt-4 mb-4">
+      <Row>
         <Col className="text-center">
           <SearchButton
             className="btn-search" // Apply the custom class

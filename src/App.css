@@ -1,12 +1,11 @@
 /* App container */
 .App {
     text-align: center;
-    background-color: #0f0f0f;
-    background-image: url('./new_pic.jpg');
+    background-color: #eff0f3;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    color: #ffffff;
+    color: #000000;
     min-height: 100vh;
     font-family: 'Helvetica Neue', sans-serif;
 }

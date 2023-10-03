@@ -2,14 +2,14 @@ import React from "react";
 import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import styled from "styled-components";
 import "./App.css";
-import AdvancedSearchComponent from "./components/AdvancedSearchComponent";
-import CreateComponent from "./components/CreateComponent";
-import CSVUpload from "./components/CSVUpload";
-import { Container, Navbar, Nav } from "react-bootstrap";
+import AdvancedSearchComponent, {
+  StyledHeader,
+} from "./pages/AdvancedSearchComponent";
+import CreateComponent from "./pages/CreateComponent";
+import CSVUpload from "./pages/CSVUpload";
+import { Navbar, Nav } from "react-bootstrap";
 import { useGlobalVoiceCommands } from "./components/VoiceCommandManager";
 import AssistantComponent from "./components/AssistantComponent";
-import { faSearch, faMusic, faFile } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const VerticalNavbar = styled(Navbar)`
   flex-direction: column;
@@ -18,8 +18,7 @@ const VerticalNavbar = styled(Navbar)`
   top: 0;
   left: 0;
   width: 100px;
-
-  background: rgba(255, 255, 255, 0.2) !important; // Adjusted opacity
+  background: #5478f0 !important; // Adjusted opacity
   backdrop-filter: blur(
     15px
   ) !important; // Increased blur for a more pronounced effect
@@ -61,10 +60,9 @@ function App() {
 
   return (
     <Router>
+      {/* Assistant component */}
+      <AssistantComponent />
       <FlexContainer className="App">
-        {/* Assistant component */}
-        <AssistantComponent />
-
         {/* Vertical Navbar on the left */}
         <VerticalNavbar bg="dark" variant="dark">
           <Navbar.Brand href="#">Tamber</Navbar.Brand>
@@ -151,7 +149,7 @@ function App() {
         </VerticalNavbar>
 
         {/* Main content offset to the right of the navbar */}
-        <MainContent className="mt-4">
+        <MainContent>
           <Routes>
             <Route path="/" element={<AdvancedSearchComponent />} />
             <Route path="/create" element={<CreateComponent />} />
@@ -166,7 +164,7 @@ function App() {
 function CSVUploadPage() {
   return (
     <div>
-      <h2>Upload Songs CSV</h2>
+      <StyledHeader>Upload Songs CSV</StyledHeader>
       <CSVUpload />
     </div>
   );

@@ -8,8 +8,8 @@ body {
 .container {
     padding: 20px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin: 20px;
@@ -27,7 +27,7 @@ h2 {
 }
 
 .form-label {
-    color: #ddd;
+    color: #ffffff;
     font-weight: bold;
 }
 
@@ -49,14 +49,14 @@ h2 {
 
 .influencer-component .era-toggle span {
     font-weight: normal;
-    color: rgb(187, 187, 187);
+    color: rgb(0, 0, 0) !important;
     cursor: pointer;
     margin-right: 10px;
 }
 
 .influencer-component .era-toggle span.active {
     font-weight: bold;
-    color: white;
+    color: black !important;
 }
 
 .custom-btn {
@@ -116,29 +116,30 @@ h2 {
 
 /* Base Button with Pink Glass Effect */
 .btn-search {
-    background-color: rgba(255, 105, 180, 0.3) !important;   /* Pink semi-transparent background */
+    background-color: #5478f0 !important;   /* Pink semi-transparent background */
     color: #eee !important;                                 
-    border: 2px solid rgba(255, 105, 180, 0.5) !important;  /* Border to enhance the glass effect */
+    border: 2px solid #5478f0 !important;  /* Border to enhance the glass effect */
     backdrop-filter: blur(10px) !important;                 /* Blur the background content */
-    box-shadow: 0 4px 6px rgba(255, 105, 180, 0.2) !important; /* Subtle shadow for depth */
-    transition: all 0.3s !important;                        /* Smooth transition for hover and active states */
+    box-shadow: 0 4px 6px #5478f0 !important; /* Subtle shadow for depth */
+    transition: all 0.3s !important;  /* Smooth transition for hover and active states */
+    margin: 20px 0 30px;
 }
 
 /* Hover State */
 .btn-search:hover {
-    background-color: rgba(255, 85, 165, 0.4) !important;   /* Slightly darker pink on hover */
-    border-color: rgba(255, 85, 165, 0.6) !important;
-    transform: scale(1.05) !important;                      /* Slightly scale the button */
+    background-color: #5478f0 !important;   /* Slightly darker pink on hover */
+    border-color: #5478f0 !important;
+    transform: scale(1.05) !important; /* Slightly scale the button */
 }
 
 /* Active (Clicked) State */
 .btn-search:active {
-    background-color: rgba(255, 65, 150, 0.5) !important;   /* Even darker pink on active */
-    border-color: rgba(255, 65, 150, 0.7) !important;
+    background-color: #5478f0 !important;   /* Even darker pink on active */
+    border-color: #5478f0 !important;
     transform: scale(1.02) !important;
 }
 
 /* Focused (For Accessibility) */
 .btn-search:focus {
-    box-shadow: 0 0 5px rgba(255, 105, 180, 0.7), 0 4px 6px rgba(255, 105, 180, 0.2) !important; /* Pink glow for focus */
+    box-shadow: 0 0 5px #5478f0, 0 4px 6px #5478f0 !important; /* Pink glow for focus */
 }

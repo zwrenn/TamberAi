@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import "./AssistantComponent.css";
+import "../components/theme/AssistantComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
+import { Button } from "react-bootstrap";
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 
 const processQueryWithGPT4 = async (query) => {
   try {
@@ -84,9 +85,9 @@ const AssistantComponent = () => {
 
   return (
     <div className="assistant-container">
-      <button className="toggle-button" onClick={() => setShowChat(!showChat)}>
+      <Button className="toggle-button" onClick={() => setShowChat(!showChat)}>
         {showChat ? "Hide Assistant" : "Show Assistant"}
-      </button>
+      </Button>
       {showChat && (
         <div className="chat-bubble">
           <p>Hello, how can I assist you today?</p>
@@ -96,7 +97,9 @@ const AssistantComponent = () => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for songs..."
           />
-          <button onClick={handleSearch}>Search</button>
+          <Button onClick={handleSearch} className="mt-4">
+            Search
+          </Button>
 
           <div className="results">
             {results.length > 0 && (

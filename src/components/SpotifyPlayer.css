@@ -20,15 +20,16 @@ html, body {
     margin: 0px;
     position: fixed;
     bottom: 0px;
+    min-width: 300px;
     width: 100%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid #fff;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 20px 3%;
+    align-items: center; 
+    padding: 10px 3%;
 }
 
 .track-info {
@@ -37,8 +38,8 @@ html, body {
 }
 
 .album-cover {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     margin-right: 15px;
     margin-left: 15px;
     background-color: gray;
@@ -46,13 +47,26 @@ html, body {
     border-radius: 6px;
 }
 
+.track-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Add more styling here if needed */
+}
+
 .track-details .track-title, .track-details .track-artist {
     color: #fff;
-    font-size: 15px;
-    width: 120px;
+    font-size: 13px;
     margin: 0;
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    min-width: 0;
+    width: 100%;
 }
+
 
 .like-icon {
     transition: color 0.3s;
@@ -64,13 +78,14 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    color: #5478f0;
+    gap: 0px;
 }
 
 .controls button {
     background-color: transparent;
     border: none;
-    color: #f8945b;
+    color: #5478f0;
     font-size: 20px;
     margin: 0 10px;
     cursor: pointer;
@@ -83,7 +98,8 @@ html, body {
 
 .controls input[type="range"] {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: -1px;
+    color: #5478f0 !important;
 }
 
 .controls button:active {
@@ -105,9 +121,9 @@ html, body {
 }
 
 .auth-controls .spotify-login {
-    color: hsl(22, 92%, 66%);
+    color: #5478f0;
     text-decoration: none;
-    border: 1px solid #f8945b;
+    border: 1px solid #5478f0;
     padding: 5px 10px;
     border-radius: 20px;
     transition: background-color 0.3s;
@@ -116,6 +132,6 @@ html, body {
 }
 
 .auth-controls .spotify-login:hover {
-    background-color: #f8945b;
+    background-color: #5478f0;
     color: #fff;
 }

@@ -303,7 +303,7 @@ const SpotifyPlayer = ({ trackUri }) => {
           className="like-icon"
           icon={faHeart}
           onClick={handleLike}
-          style={{ color: isLiked ? "lime" : "gray", cursor: "pointer" }}
+          style={{ color: isLiked ? "#5478f0" : "gray", cursor: "pointer" }}
         />
         <img
           src={trackDetails.albumCover}
@@ -321,7 +321,7 @@ const SpotifyPlayer = ({ trackUri }) => {
           value={position}
           max={duration}
           onChange={handleScrub}
-          style={{ width: "250%" }}
+          style={{ width: "350%" }}
         />
         <div className="buttons">
           <button className="prev-track" onClick={handlePreviousTrack}>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Form,
-  Container,
   Row,
   Col,
   Button as BootstrapButton,
@@ -12,6 +11,7 @@ import axios from "axios";
 import openai from "openai";
 import { addVoiceCommand } from "./VoiceCommandManager";
 import { styled } from "styled-components";
+import { StyledHeader } from "../pages/AdvancedSearchComponent";
 
 // Your OpenAI API key
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -71,12 +71,7 @@ function NewlineText({ text, onLineClick, highlightedLines }) {
 }
 
 const InputContainer = styled.div`
-  background-color: rgba(
-    255,
-    255,
-    255,
-    0.2
-  ); /* Semi-transparent white background */
+  background-color: #fff; /* Semi-transparent white background */
   padding: 30px;
   border-radius: 30px;
   margin-top: 20px;
@@ -86,7 +81,7 @@ const InputContainer = styled.div`
 
 // Similarly, update the styles for LyricContainer and TableContainer
 const LyricContainer = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #fff;
   padding: 30px 50px;
   border-radius: 30px;
   margin-top: 20px;
@@ -96,19 +91,12 @@ const LyricContainer = styled.div`
 `;
 
 const TableContainer = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #fff;
   padding: 30px 50px;
   border-radius: 30px;
   margin-top: 20px;
   overflow-y: scroll;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-`;
-
-// Create a separate styled component for the draggable levels with no backdrop filter
-const DraggableLevels = styled.div`
-  background-color: transparent; /* Set a transparent background */
-  padding: 10px; /* Adjust padding as needed */
-  /* Add any other styles specific to your draggable levels */
 `;
 
 const TableCommon = styled(Table)``;
@@ -151,9 +139,7 @@ const NewInfluencerComponent = () => {
   // eslint-disable-next-line
   const [translatedLyrics, setTranslatedLyrics] = useState("");
   const [commonOutroChords, setCommonOutroChords] = useState([]);
-  const [isEraDisabled, setIsEraDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isYearFunctionEnabled, setIsYearFunctionEnabled] = useState(true);
   const [loadingPercentage, setLoadingPercentage] = useState(0);
   // eslint-disable-next-line
   const [isYearDisabled, setIsYearDisabled] = useState(false);
@@ -577,7 +563,7 @@ const NewInfluencerComponent = () => {
         <Col md={6}>
           <InputContainer>
             <Row className="mt-1 mb-1">
-              <h2 className="mb-4">Influence Search</h2>
+              <StyledHeader className="mb-4">Influence Search</StyledHeader>
               <Col md={4}>
                 <Form.Group
                   controlId="eraYearToggle"
@@ -684,7 +670,7 @@ const NewInfluencerComponent = () => {
               </Col>
             </Row>
 
-            <Row className="mt-4 mb-4">
+            <Row>
               <Col md={4}>
                 <Form.Group controlId="artist">
                   <Form.Label>Artist Influence:</Form.Label>
@@ -767,7 +753,7 @@ const NewInfluencerComponent = () => {
         </Col>
         <Col md={6} className="text-center">
           <LyricContainer>
-            <h2>Generated Lyrics:</h2>
+            <StyledHeader>Generated Lyrics:</StyledHeader>
 
             <Form.Group
               controlId="abstractionLevel"
@@ -789,7 +775,7 @@ const NewInfluencerComponent = () => {
             {loading && (
               <div className="loader-container">
                 <div className="loader"></div>
-                <p>{loadingPercentage}%</p>
+                <p className="lyrics">{loadingPercentage}%</p>
               </div>
             )}
 
@@ -804,10 +790,10 @@ const NewInfluencerComponent = () => {
       <Row>
         <TableContainer>
           <Row>
-            <div className="common-table mt-4 mb-4">
-              <h3 style={{ color: "black", marginBottom: "20px" }}>
+            <div className="common-table">
+              <StyledHeader style={{ color: "black", marginBottom: "20px" }}>
                 Most Common
-              </h3>
+              </StyledHeader>
               <TableCommon hover responsive key={Math.random()}>
                 <thead>
                   <tr>
