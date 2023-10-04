@@ -272,6 +272,47 @@ const NewInfluencerComponent = () => {
     }
   }, [era, selectedGenre, location, selectedSong, influenceValue, year]);
 
+  const runAppleScript = useCallback(async () => {
+    // Calculate unique instruments here
+    const allInstruments = [
+      ...commonIntroInstrumentations,
+      ...commonVerseInstrumentations,
+      ...commonChorusInstrumentations,
+      ...commonBridgeInstrumentations,
+      ...commonOutroInstrumentations,
+    ];
+    const uniqueInstruments = new Set(allInstruments);
+
+    try {
+      const params = {
+        verseLength: commonVerseLengths,
+        chorusLength: commonChorusLengths,
+        introLength: commonIntroLengths,
+        bridgeLength: commonBridgeLengths,
+        outroLength: commonOutroLengths,
+        instruments: Array.from(uniqueInstruments), // Include it here
+      };
+
+      const response = await axios.get("http://localhost:5001/run-script", {
+        params,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error running script:", error);
+    }
+  }, [
+    commonVerseLengths,
+    commonChorusLengths,
+    commonIntroLengths,
+    commonBridgeLengths,
+    commonOutroLengths,
+    commonIntroInstrumentations, // Include these in the dependencies as well
+    commonVerseInstrumentations,
+    commonChorusInstrumentations,
+    commonBridgeInstrumentations,
+    commonOutroInstrumentations,
+  ]);
+
   useEffect(() => {
     const fetchGenres = async () => {
       try {
@@ -430,31 +471,6 @@ const NewInfluencerComponent = () => {
       }
     }
   };
-
-  const runAppleScript = useCallback(async () => {
-    try {
-      const params = {
-        verseLength: commonVerseLengths,
-        chorusLength: commonChorusLengths,
-        introLength: commonIntroLengths,
-        bridgeLength: commonBridgeLengths,
-        outroLength: commonOutroLengths,
-      };
-
-      const response = await axios.get("http://localhost:5001/run-script", {
-        params,
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error running script:", error);
-    }
-  }, [
-    commonVerseLengths,
-    commonChorusLengths,
-    commonIntroLengths,
-    commonBridgeLengths,
-    commonOutroLengths,
-  ]);
 
   useEffect(() => {
     setDisplayedLyrics(generatedLyrics);

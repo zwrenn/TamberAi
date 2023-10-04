@@ -2029,12 +2029,17 @@ app.get("/api/search-songs", async (req, res) => {
 
 // Run Apple Logic Script
 app.get("/run-script", (req, res) => {
-  const { introLength, verseLength, chorusLength, bridgeLength, outroLength } =
-    req.query;
+  // Combined destructuring of all needed query params
+  const {
+    introLength,
+    verseLength,
+    chorusLength,
+    bridgeLength,
+    outroLength,
+    instruments,
+  } = req.query;
 
-  // Extract the 'name' property which contains the actual length
-
-  // Ensure the values are integers
+  // Parsing the lengths to integers
   const introLengthValue = parseInt(introLength[0]?.name || 0, 10);
   const verseLengthValue = parseInt(verseLength[0]?.name || 0, 10);
   const chorusLengthValue = parseInt(chorusLength[0]?.name || 0, 10);
@@ -2050,6 +2055,9 @@ app.get("/run-script", (req, res) => {
     bridgeLengthValue,
     outroLengthValue
   );
+
+  // Debugging log for instruments
+  console.log("Extracted instruments:", instruments);
 
   // Fix the space between the parameters
   const appleScriptCommand = `osascript /Users/ZoesComputer/Desktop/TamberLogic2.scpt ${introLengthValue} ${verseLengthValue} ${chorusLengthValue} ${bridgeLengthValue} ${outroLengthValue}`;
