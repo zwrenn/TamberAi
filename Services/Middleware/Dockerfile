@@ -12,7 +12,7 @@ RUN cd ~/ && curl -sL https://deb.nodesource.com/setup_lts.x -o setup_18.sh && s
 VOLUME /app
 
 ## expose the DEV port
-EXPOSE 3000
+EXPOSE 5001
 
 ## set the Workdir
 WORKDIR /app

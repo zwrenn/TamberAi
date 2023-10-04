@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     ports:
-      - "5432:5432"
+      - "15003:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     build:
@@ -13,18 +13,22 @@ services:
         pgpwd: $DB_PASSWORD
         pgdatawriterpw: $DB_PASSWORD
         rootpw: $DB_PASSWORD
-    container_name: postgres
+        dbname: $DB_NAME
+    container_name: postgres_tamber
+    environment:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
       - DB_NAME=$DB_NAME
   
-  Middleware:
+  middleware:
     build:
       context: ./Middleware/
       dockerfile: Dockerfile
     ports:
-      - "5001:5001"
-    container_name: Middleware
+      - "15002:5001"
+    container_name: middleware_tamber
+    volumes:
+      - ./Middleware/Server:/app
     environment:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_USER
@@ -38,9 +42,10 @@ services:
       context: ./FrontEnd/
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "15001:3000"
     volumes:
       - ./FrontEnd/TamberUI:/app
+    container_name: frontend_tamber
 
 volumes:
   pgdata:
