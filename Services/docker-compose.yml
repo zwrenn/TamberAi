@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    build:
+      context: ./Postgres/
+      dockerfile: Dockerfile
+      args:
+        pgpwd: $DB_PASSWORD
+        pgdatawriterpw: $DB_PASSWORD
+        rootpw: $DB_PASSWORD
+    container_name: postgres
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_NAME=$DB_NAME
+  
+  Middleware:
+    build:
+      context: ./Middleware/
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    container_name: Middleware
+    environment:
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_USER
+      - DB_HOST=postgres
+      - DB_NAME=$DB_NAME
+      - DB_PORT=$DB_PORT
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+
+  frontend:
+    build:
+      context: ./FrontEnd/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./FrontEnd/TamberUI:/app
+
+volumes:
+  pgdata:
