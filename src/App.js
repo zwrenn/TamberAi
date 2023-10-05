@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import "./App.css";
 import AdvancedSearchComponent, {
@@ -66,7 +67,6 @@ function App() {
   return (
     <Router>
       <FlexContainer className="App">
-        {/* Vertical Navbar on the left */}
         <VerticalNavbar bg="dark" variant="dark">
           <Navbar.Brand href="#">Tamber</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -84,16 +84,13 @@ function App() {
               </Nav.Link>
               <Nav.Link as={Link} to="/upload">
                 <div className="icon-text-container">
-                  <p>
-                    <FontAwesomeIcon icon={faUpload} className="navbar-icon" />
-                  </p>
+                  <FontAwesomeIcon icon={faUpload} className="navbar-icon" />
                 </div>
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </VerticalNavbar>
 
-        {/* Main content offset to the right of the navbar */}
         <MainContent>
           <Routes>
             <Route path="/" element={<AdvancedSearchComponent />} />

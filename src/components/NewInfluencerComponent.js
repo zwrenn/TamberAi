@@ -14,7 +14,8 @@ import { styled } from "styled-components";
 import { StyledHeader } from "../pages/AdvancedSearchComponent";
 
 // Your OpenAI API key
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 openai.apiKey = OPENAI_API_KEY;
 
 const formatLyrics = (lyrics) => {
@@ -273,27 +274,34 @@ const NewInfluencerComponent = () => {
   }, [era, selectedGenre, location, selectedSong, influenceValue, year]);
 
   const runAppleScript = useCallback(async () => {
-    // Calculate unique instruments here
-    const allInstruments = [
-      ...commonIntroInstrumentations,
-      ...commonVerseInstrumentations,
-      ...commonChorusInstrumentations,
-      ...commonBridgeInstrumentations,
-      ...commonOutroInstrumentations,
-    ];
-    const uniqueInstruments = new Set(allInstruments);
-
     try {
+      // Take the top instrument from each section if available
+      console.log(
+        "Debug - commonIntroInstrumentations:",
+        commonIntroInstrumentations
+      );
+      const topInstruments = [
+        commonIntroInstrumentations[0]?.name?.toLowerCase(),
+        commonVerseInstrumentations[0]?.name?.toLowerCase(),
+        commonChorusInstrumentations[0]?.name?.toLowerCase(),
+        commonBridgeInstrumentations[0]?.name?.toLowerCase(),
+        commonOutroInstrumentations[0]?.name?.toLowerCase(),
+      ].filter(Boolean);
+
+      const uniqueTopInstruments = new Set(topInstruments); // Remove duplicates
+
       const params = {
         verseLength: commonVerseLengths,
         chorusLength: commonChorusLengths,
         introLength: commonIntroLengths,
         bridgeLength: commonBridgeLengths,
         outroLength: commonOutroLengths,
-        instruments: Array.from(uniqueInstruments), // Include it here
+        instruments: Array.from(new Set(topInstruments)).join(", "),
       };
 
-      const response = await axios.get("http://localhost:5001/run-script", {
+      console.log("Sending parameters:", params); // Debug log
+
+      const response = await axios.get("http://localhost:3000/run-script", {
         params,
       });
       console.log(response.data);
@@ -306,7 +314,7 @@ const NewInfluencerComponent = () => {
     commonIntroLengths,
     commonBridgeLengths,
     commonOutroLengths,
-    commonIntroInstrumentations, // Include these in the dependencies as well
+    commonIntroInstrumentations,
     commonVerseInstrumentations,
     commonChorusInstrumentations,
     commonBridgeInstrumentations,

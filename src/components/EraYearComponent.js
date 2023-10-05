@@ -9,7 +9,7 @@ import "./theme/EraYearComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
 import axios from "axios";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
 // const IndentedSelect = styled(Form.Control)`
 //   box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);

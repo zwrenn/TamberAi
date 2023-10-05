@@ -3,7 +3,7 @@ const { Pool } = require("pg");
 
 // Your provided constants
 // Use environment variables for sensitive information
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 const PORT = 5001;
 
 const pool = new Pool({

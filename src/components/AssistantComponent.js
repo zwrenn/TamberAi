@@ -3,8 +3,11 @@ import React, { useState, useEffect } from "react";
 import "../components/theme/AssistantComponent.css";
 import { addVoiceCommand } from "./VoiceCommandManager";
 import { Button } from "react-bootstrap";
+import openai from "openai";
 
-const OPENAI_API_KEY = "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";
+// Your OpenAI API key
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+openai.apiKey = OPENAI_API_KEY;
 
 const processQueryWithGPT4 = async (query) => {
   try {
@@ -29,11 +32,8 @@ const processQueryWithGPT4 = async (query) => {
   }
 };
 
-const searchDatabase = async (inferredMood) => {
+const searchDatabase = async (processedMoods) => {
   try {
-    const processedMoods = inferredMood[0]
-      .split(",")
-      .map((mood) => mood.trim().replace("'", ""));
     const response = await axios.post("http://localhost:5001/api/search-mood", {
       moodsFromGPT: processedMoods,
     });
@@ -66,9 +66,15 @@ const AssistantComponent = ({ setSelectedTrackUri }) => {
   const handleSearch = async () => {
     try {
       const inferredMood = await processQueryWithGPT4(query);
-      const splitMoods = inferredMood[0].split(",").map((mood) => mood.trim());
-      const matchingSongs = await searchDatabase(splitMoods);
-      setResults(matchingSongs);
+      if (inferredMood) {
+        const splitMoods = inferredMood[0]
+          .split(",")
+          .map((mood) => mood.trim());
+        const matchingSongs = await searchDatabase(splitMoods);
+        setResults(matchingSongs);
+      } else {
+        throw new Error("Failed to process query with GPT-4");
+      }
     } catch (err) {
       console.error("Error in handleSearch:", err);
       setError("Sorry, something went wrong. Please try again.");

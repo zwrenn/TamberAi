@@ -1,0 +1,15 @@
+.wake-up-component {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px;
+  font-size: 18px;
+  transition: all 0.3s ease-in-out; /* for smooth transition */
+}
+
+.wake-up-component.awake {
+  background-color: green;
+  color: white;
+  border-color: darkgreen;
+  box-shadow: 0 4px 8px rgba(0, 128, 0, 0.3); /* Add some shadow for more depth */
+}

@@ -17,7 +17,7 @@ const translate = new Translate({
 });
 
 // Use environment variables for sensitive information
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 const PORT = 5001;
 
 const pool = new Pool({
@@ -2027,8 +2027,26 @@ app.get("/api/search-songs", async (req, res) => {
   }
 });
 
+app.post("/api/toggle", (req, res) => {
+  exec(
+    "osascript /Users/ZoesComputer/Desktop/Tracking/TogglePlayPause.scpt",
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error}`);
+        return res.status(500).send(error);
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+      return res.status(200).send("Toggled");
+    }
+  );
+});
+
 // Run Apple Logic Script
 app.get("/run-script", (req, res) => {
+  // Debugging: Log received query parameters
+  console.log("Received query parameters:", req.query);
+
   // Combined destructuring of all needed query params
   const {
     introLength,
@@ -2039,6 +2057,9 @@ app.get("/run-script", (req, res) => {
     instruments,
   } = req.query;
 
+  // Debugging: Log instruments received in query
+  console.log("Debugging instruments:", instruments);
+
   // Parsing the lengths to integers
   const introLengthValue = parseInt(introLength[0]?.name || 0, 10);
   const verseLengthValue = parseInt(verseLength[0]?.name || 0, 10);
@@ -2046,7 +2067,7 @@ app.get("/run-script", (req, res) => {
   const bridgeLengthValue = parseInt(bridgeLength[0]?.name || 0, 10);
   const outroLengthValue = parseInt(outroLength[0]?.name || 0, 10);
 
-  // Debugging logs to check received parameters
+  // Debugging: Log parsed lengths
   console.log(
     "Extracted lengths:",
     introLengthValue,
@@ -2056,20 +2077,80 @@ app.get("/run-script", (req, res) => {
     outroLengthValue
   );
 
-  // Debugging log for instruments
-  console.log("Extracted instruments:", instruments);
+  // Transform the instruments object into an array of names
+  const instrumentNames = instruments || "";
 
-  // Fix the space between the parameters
-  const appleScriptCommand = `osascript /Users/ZoesComputer/Desktop/TamberLogic2.scpt ${introLengthValue} ${verseLengthValue} ${chorusLengthValue} ${bridgeLengthValue} ${outroLengthValue}`;
+  // Debugging: Type of instrumentNames
+  console.log("Type of instrumentNames:", typeof instrumentNames);
 
-  // Log for debugging
-  console.log("AppleScript Command:", appleScriptCommand);
+  // Sanitize instrument names to remove any characters that might break the command
+  const sanitizedInstrumentNames = instrumentNames.replace(/["\n]/g, "");
 
-  exec(appleScriptCommand, (error, stdout, stderr) => {
+  // Debugging: Sanitized instrument names
+  console.log(
+    "Debugging sanitized instrument names before AppleScript:",
+    sanitizedInstrumentNames
+  );
+
+  // Convert the sanitized string to an array, remove duplicates, and convert it back to a string
+  const uniqueInstrumentNames = Array.from(
+    new Set(sanitizedInstrumentNames.split(", ").map((s) => s.trim()))
+  ).join(", ");
+
+  // Debugging: Unique instrument names
+  console.log(
+    "Debugging unique instrument names before AppleScript:",
+    uniqueInstrumentNames
+  );
+
+  // Split the comma-separated string of instrument names into an array
+  const instrumentNamesArray = uniqueInstrumentNames
+    .split(", ")
+    .map((s) => s.trim());
+
+  // Check if "drums" is in the list, and if so, move it to the front:
+  if (instrumentNamesArray.includes("drums")) {
+    const index = instrumentNamesArray.indexOf("drums");
+    instrumentNamesArray.splice(index, 1);
+    instrumentNamesArray.unshift("drums");
+  }
+
+  // Wrap each instrument name in quotes
+  const quotedInstrumentNames = instrumentNamesArray
+    .map((name) => `"${name}"`)
+    .join(" ");
+
+  // Construct the AppleScript command using the quoted instrument names
+  const appleScriptCommand =
+    "osascript /Users/ZoesComputer/Desktop/TamberLogic2.scpt " +
+    introLengthValue +
+    " " +
+    verseLengthValue +
+    " " +
+    chorusLengthValue +
+    " " +
+    bridgeLengthValue +
+    " " +
+    outroLengthValue +
+    " " +
+    quotedInstrumentNames;
+
+  // Debugging: Log final AppleScript command
+  console.log("Final AppleScript Command:", appleScriptCommand);
+
+  // Open a new Terminal window and execute the AppleScript command
+  const terminalCommand = `osascript -e 'tell application "Terminal" to do script "${appleScriptCommand.replace(
+    /"/g,
+    '\\"'
+  )}"'`;
+
+  exec(terminalCommand, (error, stdout, stderr) => {
     if (error) {
-      console.error(`exec error: ${error}`);
+      console.error(`Error executing script: ${error}`);
       return res.sendStatus(500);
     }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
     res.send("Script executed");
   });
 });
