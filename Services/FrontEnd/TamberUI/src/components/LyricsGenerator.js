@@ -3,7 +3,7 @@ import openai from "openai";
 import "./LyricsGenerator.css";
 
 // Your OpenAI API key
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 openai.apiKey = OPENAI_API_KEY;
 
 function LyricsGenerator() {
