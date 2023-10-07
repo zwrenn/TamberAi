@@ -211,7 +211,7 @@ const NewInfluencerComponent = () => {
     console.log("influenceValue:", influenceValue);
 
     try {
-      let apiUrl = "http://localhost:5001/api/popular-instruments?";
+      let apiUrl = "http://localhost:15002/api/popular-instruments?";
 
       if (era) {
         apiUrl += `era=${era}&`;
@@ -301,7 +301,7 @@ const NewInfluencerComponent = () => {
 
       console.log("Sending parameters:", params); // Debug log
 
-      const response = await axios.get("http://localhost:3000/run-script", {
+      const response = await axios.get("http://localhost:15002/run-script", {
         params,
       });
       console.log(response.data);
@@ -324,7 +324,7 @@ const NewInfluencerComponent = () => {
   useEffect(() => {
     const fetchGenres = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/genres");
+        const response = await fetch("http://localhost:15002/api/genres");
         const data = await response.json();
         setGenres(data);
       } catch (error) {
@@ -387,7 +387,7 @@ const NewInfluencerComponent = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5001/generateLyrics",
+        "http://localhost:15002/generateLyrics",
         payload
       );
 
@@ -462,7 +462,7 @@ const NewInfluencerComponent = () => {
         setDisplayedLyrics(generatedLyrics);
         setIsTranslated(false);
       } else {
-        const response = await axios.post("http://localhost:5001/translate", {
+        const response = await axios.post("http://localhost:15002/translate", {
           text: generatedLyrics,
         });
         if (response.data && response.data.translation) {
@@ -488,7 +488,7 @@ const NewInfluencerComponent = () => {
     // Use the fetchData function for error handling
     const fetchAllSongs = async () => {
       try {
-        const allSongs = await fetchData("http://localhost:5001/api/songs");
+        const allSongs = await fetchData("http://localhost:15002/api/songs");
         console.log("Fetched all songs:", allSongs);
         setSongs(allSongs);
       } catch (error) {
@@ -502,7 +502,7 @@ const NewInfluencerComponent = () => {
     // Use the fetchData function for error handling
     const fetchAllSongs = async () => {
       try {
-        const allSongs = await fetchData("http://localhost:5001/api/songs");
+        const allSongs = await fetchData("http://localhost:15002/api/songs");
         console.log("Fetched all songs:", allSongs);
         setSongs(allSongs);
       } catch (error) {
@@ -515,7 +515,7 @@ const NewInfluencerComponent = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/countries");
+        const response = await fetch("http://localhost:15002/api/countries");
         const data = await response.json();
         console.log("Fetched countries:", data); // Log the fetched data
         setCountries(data);

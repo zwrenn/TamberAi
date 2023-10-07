@@ -34,7 +34,7 @@ const processQueryWithGPT4 = async (query) => {
 
 const searchDatabase = async (processedMoods) => {
   try {
-    const response = await axios.post("http://localhost:5001/api/search-mood", {
+    const response = await axios.post("http://localhost:15002/api/search-mood", {
       moodsFromGPT: processedMoods,
     });
     return response.data;

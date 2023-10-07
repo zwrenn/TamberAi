@@ -157,7 +157,7 @@ const EraYearComponent = (props) => {
         .map((mood) => mood.trim().replace("'", ""));
 
       const response = await axios.post(
-        "http://localhost:5001/api/search-mood",
+        "http://localhost:15002/api/search-mood",
         { moodsFromGPT: processedMoods }
       );
       return response.data;
@@ -192,7 +192,7 @@ const EraYearComponent = (props) => {
   useEffect(() => {
     const fetchCamelotValues = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/camelot");
+        const response = await fetch("http://localhost:15002/api/camelot");
         const data = await response.json();
         setCamelot(data);
       } catch (error) {
@@ -207,7 +207,7 @@ const EraYearComponent = (props) => {
   useEffect(() => {
     const fetchInstruments = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/instruments");
+        const response = await fetch("http://localhost:15002/api/instruments");
         const data = await response.json();
         setInstruments(data);
       } catch (error) {
@@ -222,7 +222,7 @@ const EraYearComponent = (props) => {
   useEffect(() => {
     const fetchGenres = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/genres");
+        const response = await fetch("http://localhost:15002/api/genres");
         const data = await response.json();
         setGenres(data);
       } catch (error) {
@@ -237,7 +237,7 @@ const EraYearComponent = (props) => {
   useEffect(() => {
     const fetchKeys = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/keysignatures");
+        const response = await fetch("http://localhost:15002/api/keysignatures");
         const data = await response.json();
         console.log("Fetched keys:", data);
         setKeys(data);
@@ -253,7 +253,7 @@ const EraYearComponent = (props) => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/countries");
+        const response = await fetch("http://localhost:15002/api/countries");
         const data = await response.json();
         console.log("Fetched countries:", data); // Log the fetched data
         setCountries(data);

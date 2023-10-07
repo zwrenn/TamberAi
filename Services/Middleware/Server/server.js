@@ -19,7 +19,7 @@ const translate = new Translate({
 
 // Use environment variables for sensitive information
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const PORT = 5001;
+const PORT = 5002;
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -593,7 +593,7 @@ app.post("/get-gpt3-response", async (req, res) => {
     // Case: Both era and genre are mentioned
     if (userEra && userGenre) {
       const attributesResponse = await axios.get(
-        "http://localhost:5001/api/popular-instruments",
+        "http://localhost:5002/api/popular-instruments",
         {
           params: { era: userEra, genre: userGenreID },
         }
@@ -811,7 +811,7 @@ app.post("/get-gpt3-response", async (req, res) => {
 
       // Fetch popular attributes for the era
       const attributesResponse = await axios.get(
-        "http://localhost:5001/api/popular-instruments",
+        "http://localhost:5002/api/popular-instruments",
         {
           params: { era: era },
         }
@@ -2144,6 +2144,11 @@ app.get("/api/popular-aspects", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 5001, () => {
-  console.log(`Server is running on port ${process.env.PORT || 5001}`);
+// app.listen(process.env.PORT || 5002, () => {
+//  console.log(`Server is running on port ${process.env.PORT || 5002}`);
+// });
+
+app.listen(PORT, () => {
+console.log(`Server is running on port ${process.env.PORT || 5002}`);
 });
+

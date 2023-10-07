@@ -19,7 +19,7 @@ const SearchButton = ({
   ...otherProps
 }) => {
   const handleSearch = async () => {
-    let url = "http://localhost:5001/api/songs?";
+    let url = "http://localhost:15002/api/songs?";
 
     if (searchText) {
       url += `search=${searchText}&`;
