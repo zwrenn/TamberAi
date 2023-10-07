@@ -1,14 +1,14 @@
-import dotenv
+# import dotenv
 import os
 import openai
 import sys
 import json
 
-# Load environment variables from .env file
-dotenv.load_dotenv()
+# # Load environment variables from .env file
+# dotenv.load_dotenv()
 
 # Read OpenAI API key from environment variables
-OPENAI_API_KEY = os.environ.get('REACT_APP_OPENAI_API_KEY')
+openai.api_key = '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'
 
 
 def generate_lyrics(prompt, max_tokens=500, engine="text-davinci-003"):

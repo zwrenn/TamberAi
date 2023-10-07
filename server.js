@@ -383,14 +383,14 @@ async function getGPT3Response(prompt) {
   return response.data.choices[0].text.trim();
 }
 
-app.options("/api/generate-lyrics", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.sendStatus(200);
-});
+// app.options("/generate-lyrics", (req, res) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.sendStatus(200);
+// });
 
-app.post("/api/generate-lyrics", (req, res) => {
+app.post("/generate-lyrics", (req, res) => {
   console.log("YOU'RE BEING CALLED!!!");
   try {
     console.log("Backend Received Request Body:", req.body);
@@ -410,6 +410,8 @@ app.post("/api/generate-lyrics", (req, res) => {
       prompt: req.body.prompt,
       highlightedLines: highlightedLines,
       existingLyrics: existingLyrics,
+      selectedGenreName: selectedGenreName,
+      abstractionLevel: abstractionLevel,
     };
 
     console.log("Frontend Highlighted Lines:", highlightedLines);
@@ -441,8 +443,8 @@ app.post("/api/generate-lyrics", (req, res) => {
       highlightedLines
     );
     const pythonProcess = highlightedLines
-      ? spawn("python", ["generate_lyrics.py", ...pythonArgs])
-      : spawn("python", ["generate_lyrics.py", req.body.prompt]);
+      ? spawn("python3", ["generate_lyrics.py", ...pythonArgs])
+      : spawn("python3", ["generate_lyrics.py", req.body.prompt]);
 
     let responseSent = false; // Initialize the flag here
 

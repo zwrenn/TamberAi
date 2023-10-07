@@ -386,10 +386,14 @@ const NewInfluencerComponent = () => {
         abstractionLevel: abstractionLevel,
       };
 
+      console.log("PAYLOAD", payload);
+
       const response = await axios.post(
-        "http://localhost:5001/api/generate-lyrics",
+        "http://localhost:5001/generate-lyrics",
         payload
       );
+
+      console.log("DO YOU SEE ME???");
 
       if (response.data && response.data.lyrics) {
         const newLyrics = formatLyrics(response.data.lyrics);
@@ -398,7 +402,7 @@ const NewInfluencerComponent = () => {
         console.error("Unexpected response data:", response.data);
       }
     } catch (error) {
-      console.error("Error generating lyrics:", error);
+      console.error("GIVE ME THE ERROR PLEASEE:", error);
       if (error.response && error.response.data) {
         console.error("Server response:", error.response.data);
       }
