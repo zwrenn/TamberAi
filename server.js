@@ -18,7 +18,7 @@ const translate = new Translate({
 
 // Use environment variables for sensitive information
 const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
-const PORT = 5001;
+const PORT = process.env.REACT_APP_PORT;
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -383,85 +383,90 @@ async function getGPT3Response(prompt) {
   return response.data.choices[0].text.trim();
 }
 
-app.options("/generateLyrics", (req, res) => {
+app.options("/api/generate-lyrics", (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.sendStatus(200);
 });
 
-app.post("/generateLyrics", (req, res) => {
-  console.log("Backend Received Request Body:", req.body);
+app.post("/api/generate-lyrics", (req, res) => {
+  console.log("YOU'RE BEING CALLED!!!");
+  try {
+    console.log("Backend Received Request Body:", req.body);
 
-  const maxTokens = req.body.maxTokens || 200;
-  const highlightedLines = req.body.highlightedLines || {};
-  // console.log("Debug: Received highlighted lines from frontend:", highlightedLines);
-  const existingLyrics = Object.values(highlightedLines).join("\n");
-  const abstractionLevel = req.body.abstractionLevel || 0;
-  const selectedGenreName = req.body.selectedGenreName;
+    const maxTokens = req.body.maxTokens || 200;
+    const highlightedLines = req.body.highlightedLines || {};
+    // console.log("Debug: Received highlighted lines from frontend:", highlightedLines);
+    const existingLyrics = Object.values(highlightedLines).join("\n");
+    const abstractionLevel = req.body.abstractionLevel || 0;
+    const selectedGenreName = req.body.selectedGenreName;
 
-  // Debug lines
-  // console.log("Debug: Existing Lyrics from Frontend:", existingLyrics);
-  // console.log("Debug: Highlighted Lines from Frontend:", highlightedLines);
+    // Debug lines
+    // console.log("Debug: Existing Lyrics from Frontend:", existingLyrics);
+    // console.log("Debug: Highlighted Lines from Frontend:", highlightedLines);
 
-  const payload = {
-    prompt: req.body.prompt,
-    highlightedLines: highlightedLines,
-    existingLyrics: existingLyrics,
-  };
+    const payload = {
+      prompt: req.body.prompt,
+      highlightedLines: highlightedLines,
+      existingLyrics: existingLyrics,
+    };
 
-  console.log("Frontend Highlighted Lines:", highlightedLines);
-  console.log("Frontend Payload:", payload);
+    console.log("Frontend Highlighted Lines:", highlightedLines);
+    console.log("Frontend Payload:", payload);
 
-  // Declare pythonArgs before logging it & Add a new argument for song structure
-  const pythonArgs = [
-    req.body.prompt,
-    maxTokens,
-    JSON.stringify(highlightedLines),
-    existingLyrics,
-    abstractionLevel,
-    selectedGenreName,
-    JSON.stringify([
-      "Verse 1",
-      "Chorus",
-      "Verse 2",
-      "Chorus",
-      "Bridge",
-      "Chorus",
-    ]), // new argument
-  ];
+    // Declare pythonArgs before logging it & Add a new argument for song structure
+    const pythonArgs = [
+      req.body.prompt,
+      maxTokens,
+      JSON.stringify(highlightedLines),
+      existingLyrics,
+      abstractionLevel,
+      selectedGenreName,
+      JSON.stringify([
+        "Verse 1",
+        "Chorus",
+        "Verse 2",
+        "Chorus",
+        "Bridge",
+        "Chorus",
+      ]), // new argument
+    ];
 
-  // Now log pythonArgs
-  console.log("Sending to Python script:", pythonArgs); // Debug line to print payload
+    // Now log pythonArgs
+    console.log("Sending to Python script:", pythonArgs); // Debug line to print payload
 
-  console.log(
-    "Debug: Sending highlighted lines to Python script:",
-    highlightedLines
-  );
-  const pythonProcess = highlightedLines
-    ? spawn("python", ["generate_lyrics.py", ...pythonArgs])
-    : spawn("python", ["generate_lyrics.py", req.body.prompt]);
+    console.log(
+      "Debug: Sending highlighted lines to Python script:",
+      highlightedLines
+    );
+    const pythonProcess = highlightedLines
+      ? spawn("python", ["generate_lyrics.py", ...pythonArgs])
+      : spawn("python", ["generate_lyrics.py", req.body.prompt]);
 
-  let responseSent = false; // Initialize the flag here
+    let responseSent = false; // Initialize the flag here
 
-  pythonProcess.stdout.on("data", (data) => {
-    console.log("Received from Python: ", data.toString());
-    if (!responseSent) {
-      // Check the flag before sending a response
-      res.json({ lyrics: data.toString() });
-      responseSent = true; // Set the flag to true after sending a response
-    }
-    // ... (your existing code for handling stdout)
-  });
+    pythonProcess.stdout.on("data", (data) => {
+      console.log("Received from Python: ", data.toString());
+      if (!responseSent) {
+        // Check the flag before sending a response
+        res.json({ lyrics: data.toString() });
+        responseSent = true; // Set the flag to true after sending a response
+      }
+      // ... (your existing code for handling stdout)
+    });
 
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
-    if (!responseSent) {
-      // Check the flag before sending a response
-      res.status(500).send(data.toString());
-      responseSent = true; // Set the flag to true after sending a response
-    }
-  });
+    pythonProcess.stderr.on("data", (data) => {
+      console.error(`stderr: ${data}`);
+      if (!responseSent) {
+        // Check the flag before sending a response
+        res.status(500).send(data.toString());
+        responseSent = true; // Set the flag to true after sending a response
+      }
+    });
+  } catch (error) {
+    console.log("ERROR POST NOT WORKING!!", error);
+  }
 });
 
 async function getGenreIDFromName(genreName) {
@@ -2232,6 +2237,6 @@ app.get("/api/popular-aspects", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 5001, () => {
-  console.log(`Server is running on port ${process.env.PORT || 5001}`);
+app.listen(process.env.REACT_APP_PORT, () => {
+  console.log(`Server is running on port ${process.env.REACT_APP_PORT}`);
 });

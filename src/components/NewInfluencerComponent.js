@@ -387,7 +387,7 @@ const NewInfluencerComponent = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5001/generateLyrics",
+        "http://localhost:5001/api/generate-lyrics",
         payload
       );
 
